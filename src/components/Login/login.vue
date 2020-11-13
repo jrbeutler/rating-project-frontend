@@ -44,7 +44,7 @@
                 id="passWord"
                 name="passWord"
               />
-              <img class="eyes" @click="showPwd" src="/eye.ico" />
+              <img class="eyes" @click="showPwd" src="/eye.ico" alt="" />
             </div>
             <!--<label class="notice" @click="showPwd">Hover</label>-->
             <label
@@ -68,7 +68,7 @@
   </form>
 </template>
 
-<style lang="less" src="./login.less"></style>
+<style lang="sass" src="./login.sass"></style>
 <script lang="ts">
 export default {
   name: "login",
