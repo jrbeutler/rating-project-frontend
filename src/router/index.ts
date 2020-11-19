@@ -3,6 +3,7 @@ import Home from "../views/Home.vue";
 import About from "../views/About.vue";
 import Calculator from "../views/Calculator.vue";
 import Login from "../components/Login/login.vue";
+import Account from "../components/Account/Account.vue";
 const routerHistory = createWebHistory();
 
 //eslint-disable-next-line
@@ -26,6 +27,11 @@ const routes = <Array<any>>[
     path: "/login",
     name: "Login",
     component: Login
+  },
+  {
+    path: "/account",
+    name: "Account",
+    component: Account
   }
 ];
 
