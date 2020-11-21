@@ -25,6 +25,8 @@ const Login: React.FC = () => {
       } else {
         sessionContext.setLoginSession(results.data.login.accessToken);
         userContext.setCurrentUser(results.data.login.user);
+        window.sessionStorage.setItem('ratingToken', results.data.login.accessToken);
+        history.push('/');
       }
     });
   };

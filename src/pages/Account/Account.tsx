@@ -19,6 +19,7 @@ const Account: React.FC = () => {
       <section>
         <img src={ProfilePlaceholder} alt='Profile Image' title='Profile Image' />
         <article>
+          <button onClick={() => history.push('/rate')}>Rate</button>
           <h1>John Doe</h1>
           <h2>Mobile Apprentice</h2>
           <p>Overall Rating:</p>

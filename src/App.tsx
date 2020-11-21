@@ -29,7 +29,7 @@ const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User>({id: '', email: ''});
 
   const getAuthToken = () => {
-    const token = window.localStorage.getItem('ratingToken');
+    const token = window.sessionStorage.getItem('ratingToken');
     return token ? setLoginSession(token) : null;
   }
 
