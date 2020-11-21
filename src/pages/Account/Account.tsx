@@ -1,12 +1,18 @@
 import React, { useContext, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
 import { AuthContext, UserContext } from '../../App';
 
 const Account: React.FC = () => {
   const sessionContext = useContext(AuthContext);
   const userContext = useContext(UserContext);
+  const history = useHistory();
 
-  useEffect()
+  useEffect(() => {
+    if (sessionContext.loginSession === '') {
+      history.push('/login');
+    }
+  });
 
   return (
     <section>

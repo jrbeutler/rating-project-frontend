@@ -30,7 +30,7 @@ const Login: React.FC = () => {
   };
 
   useEffect(() => {
-    if (sessionContext.loginSession !== null) {
+    if (sessionContext.loginSession !== '') {
       history.push("/");
     }
   });
