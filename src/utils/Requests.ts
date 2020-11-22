@@ -111,7 +111,7 @@ export default class Requests {
   };
 
   static getCurrentUser = (sessionToken: string) => {
-    axios({
+    const promise = axios({
       url: config.apiURL,
       method: 'post',
       headers: {
@@ -131,12 +131,8 @@ export default class Requests {
         }
         `
       }
-    }).then((result) => {
-      console.log(result);
-      return(result);
-    }).catch((e) => {
-      return(e.message);
     });
+    return promise;
   };
 
   static getUserRatings = (sessionToken: string, userID: string) => {

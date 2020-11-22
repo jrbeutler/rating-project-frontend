@@ -5,6 +5,7 @@ import Header from './components/Header/Header';
 import Account from './pages/Account/Account';
 import Login from './pages/Login/Login';
 import Rate from './pages/Rate/Rate';
+import Requests from "./utils/Requests";
 
 type User = {
   id: string;
@@ -37,7 +38,13 @@ const App: React.FC = () => {
 
   const getAuthToken = () => {
     const token = window.sessionStorage.getItem('ratingToken');
-    return token ? setLoginSession(token) : null;
+    if (token) {
+      setLoginSession(token);
+      Requests.getCurrentUser(token).then((r) => {
+        const user = r.data.data;
+        setCurrentUser(user.me);
+      });
+    }
   }
 
   useEffect(() => {

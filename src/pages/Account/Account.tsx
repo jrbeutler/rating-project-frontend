@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
 import { AuthContext, UserContext } from '../../App';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
+import { Button, Typography } from "@material-ui/core";
 import Requests from "../../utils/Requests";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
 
@@ -67,6 +67,7 @@ const Account: React.FC = () => {
   const [receivedRatings, setReceivedRatings] = useState<UserRatings>({});
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>({});
   const [overallRating, setOverallRating] = useState<number>(0);
+  const [showCreatedReviews, setShowCreatedReviews] = useState<boolean>(false);
 
   const calculateAverageRating = () => {
     let ratingTotal = 0;
@@ -104,24 +105,28 @@ const Account: React.FC = () => {
         </article>
       </section>
       <section>
-        <section>
-          {(receivedRatings.userRatings && receivedRatings.userRatings.length > 0) &&
-          receivedRatings.userRatings.map((rating) => {
-            return <p key={rating.id}>{rating.category}</p>
-          })
-          }
-        </section>
-        <section className={classes.userReviewedSection}>
-          {(userCreatedRatings.userReviewedRatings && userCreatedRatings.userReviewedRatings.length > 0) &&
-          userCreatedRatings.userReviewedRatings.map((rating) => {
-            return <CreatedRatingCard
-              reviewedID={rating.reviewedID}
-              category={rating.category}
-              rating={rating.rating}
-              notes={rating.notes ?? rating.notes}/>
-          })
-          }
-        </section>
+        <Button onClick={() => setShowCreatedReviews(false)}>Rating Categories</Button>
+        <Button onClick={() => setShowCreatedReviews(true)}>Ratings Given</Button>
+        {showCreatedReviews ?
+          <section>
+            {(receivedRatings.userRatings && receivedRatings.userRatings.length > 0) &&
+            receivedRatings.userRatings.map((rating) => {
+              return <p key={rating.id}>{rating.category}</p>
+            })
+            }
+          </section> :
+          <section className={classes.userReviewedSection}>
+            {(userCreatedRatings.userReviewedRatings && userCreatedRatings.userReviewedRatings.length > 0) &&
+            userCreatedRatings.userReviewedRatings.map((rating) => {
+              return <CreatedRatingCard
+                reviewedID={rating.reviewedID}
+                category={rating.category}
+                rating={rating.rating}
+                notes={rating.notes ?? rating.notes}/>
+            })
+            }
+          </section>
+        }
       </section>
     </section>
   );
