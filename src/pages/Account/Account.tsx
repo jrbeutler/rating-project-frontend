@@ -14,14 +14,15 @@ const Account: React.FC = () => {
     }
   });
 
+  console.log(userContext.currentUser);
+
   return (
     <section>
       <section>
         <img src={ProfilePlaceholder} alt='Profile Image' title='Profile Image' />
         <article>
-          <button onClick={() => history.push('/rate')}>Rate</button>
-          <h1>John Doe</h1>
-          <h2>Mobile Apprentice</h2>
+          <h1>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</h1>
+          <h2>{userContext.currentUser.role}</h2>
           <p>Overall Rating:</p>
         </article>
       </section>

@@ -9,8 +9,8 @@ import Rate from './pages/Rate/Rate';
 type User = {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   role: string;
 }
 
@@ -23,8 +23,8 @@ export const UserContext = React.createContext({
   currentUser: {
     id: '',
     email: '',
-    firstName: '',
-    lastName: '',
+    firstname: '',
+    lastname: '',
     role: ''
   },
   setCurrentUser(user: {}) {},
@@ -33,7 +33,7 @@ export const UserContext = React.createContext({
 
 const App: React.FC = () => {
   const [loginSession, setLoginSession] = useState<string>('');
-  const [currentUser, setCurrentUser] = useState<User>({id: '', email: '', firstName: '', lastName: '', role: ''});
+  const [currentUser, setCurrentUser] = useState<User>({id: '', email: '', firstname: '', lastname: '', role: ''});
 
   const getAuthToken = () => {
     const token = window.sessionStorage.getItem('ratingToken');

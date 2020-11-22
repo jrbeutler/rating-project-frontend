@@ -16,6 +16,9 @@ export default class Requests {
               user {
                 id
                 email
+                firstname
+                lastname
+                role
               }
             }
           }
@@ -47,6 +50,7 @@ export default class Requests {
         `
       }
     }).then((result) => {
+      console.log(result);
       return(result);
     }).catch((e) => {
       return(e.message);
