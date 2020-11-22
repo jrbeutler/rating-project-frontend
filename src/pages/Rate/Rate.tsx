@@ -1,9 +1,19 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext, UserContext } from "../../App";
 import { useHistory } from "react-router-dom";
 import { FormLabel } from "@material-ui/core";
 import Select from '@material-ui/core/Select';
 import Requests from '../../utils/Requests';
+
+type AllUser = {
+  allUsers?: [{
+    id: string,
+    email: string,
+    firstname: string,
+    lastname: string,
+    role: string,
+  }];
+}
 
 const Rate: React.FC = () => {
   const sessionContext = useContext(AuthContext);
@@ -13,7 +23,7 @@ const Rate: React.FC = () => {
     reviewedID: "",
     Category: "",
   });
-  let users: any[] = [];
+  const [users, setUsers] = useState<AllUser>({});
 
   const handleChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
     const name = event.target.name as keyof typeof state;
@@ -33,11 +43,10 @@ const Rate: React.FC = () => {
     Requests.getAllUsers(sessionContext.loginSession).then((r) => {
       console.log(r);
       const results = r.data;
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      users = results.data;
+      setUsers(results.data);
       console.log(users);
     });
-  })
+  }, [sessionContext.loginSession])
 
 
   return (
@@ -58,7 +67,8 @@ const Rate: React.FC = () => {
             id: 'reviewedID',
           }}
         >
-          {users.map(user => {
+          {(users.allUsers && users.allUsers.length > 0) &&
+            users.allUsers.map(user => {
             return <option key={user.id}>
               {user.firstname} {user.lastname}</option>
           })
