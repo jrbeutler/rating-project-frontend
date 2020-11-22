@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Redirect, Route, Switch, useHistory } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header/Header';
 import Account from './pages/Account/Account';
@@ -35,21 +35,23 @@ export const UserContext = React.createContext({
 const App: React.FC = () => {
   const [loginSession, setLoginSession] = useState<string>('');
   const [currentUser, setCurrentUser] = useState<User>({id: '', email: '', firstname: '', lastname: '', role: ''});
-
-  const getAuthToken = () => {
-    const token = window.sessionStorage.getItem('ratingToken');
-    if (token) {
-      setLoginSession(token);
-      Requests.getCurrentUser(token).then((r) => {
-        const user = r.data.data;
-        setCurrentUser(user.me);
-      });
-    }
-  }
+  const history = useHistory();
 
   useEffect(() => {
-    getAuthToken();
-  }, []);
+    let isMounted = true; // note this flag denote mount status
+    const token = window.sessionStorage.getItem('ratingToken');
+    if (token) {
+      if (isMounted) setLoginSession(token);
+      Requests.getCurrentUser(token).then((r) => {
+        const user = r.data.data;
+        if (user == null) {
+          if (history) history.push('/login');
+        }
+        if (isMounted && user) setCurrentUser(user.me);
+      });
+    }
+    return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
+  });
 
   return (
     <section className='App'>

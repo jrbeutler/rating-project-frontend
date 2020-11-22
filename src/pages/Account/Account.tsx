@@ -42,10 +42,29 @@ const useStyles = makeStyles((theme: Theme) =>
       flexWrap: 'wrap',
       width: '100%',
       justifyContent: 'space-evenly',
+      alignItems: 'center',
+      paddingTop: '0.5rem',
     },
     profileImage: {
       width: '20rem',
       height: 'auto',
+    },
+    name: {
+      fontSize: '2rem',
+      fontWeight: 'normal',
+      textAlign: 'left',
+      paddingBottom: '0.5rem',
+      borderBottom: 'solid 2px',
+    },
+    role: {
+      fontSize: '1.5rem',
+      fontWeight: 'normal',
+      textAlign: 'left',
+      marginTop: '0.5rem',
+      marginBottom: '0.5rem',
+    },
+    rating: {
+
     },
     activeButton: {
       color: '#FFFFFF',
@@ -56,8 +75,9 @@ const useStyles = makeStyles((theme: Theme) =>
       flexWrap: 'nowrap',
       justifyContent: 'center',
       backgroundColor: '#85CAB0',
-      width: '100%',
-      height: '100vh',
+    },
+    categoriesSection: {
+      backgroundColor: '#85CAB0',
     },
   }),
 );
@@ -76,7 +96,10 @@ const Account: React.FC = () => {
 
   const calculateAverageRating = () => {
     let ratingTotal = 0;
-    if (receivedRatings.userRatings) {
+    if (receivedRatings && receivedRatings.userRatings == null) {
+      setOverallRating(0);
+    }
+    if (receivedRatings && receivedRatings.userRatings) {
       for (let i = 0; i < receivedRatings.userRatings.length; i++) {
         ratingTotal += receivedRatings.userRatings[i].rating;
       }
@@ -86,7 +109,7 @@ const Account: React.FC = () => {
 
   const calculateAverageFrontend = () => {
     let ratingTotal = 0;
-    if (receivedRatings.userRatings) {
+    if (receivedRatings && receivedRatings.userRatings) {
       const frontendRatings = receivedRatings.userRatings.filter(rating => rating.category === 'FRONTEND');
       for (let i = 0; i < frontendRatings.length; i++) {
         ratingTotal += frontendRatings[i].rating;
@@ -97,7 +120,7 @@ const Account: React.FC = () => {
 
   const calculateAverageBackend = () => {
     let ratingTotal = 0;
-    if (receivedRatings.userRatings) {
+    if (receivedRatings && receivedRatings.userRatings) {
       const backendRatings = receivedRatings.userRatings.filter(rating => rating.category === 'BACKEND');
       for (let i = 0; i < backendRatings.length; i++) {
         ratingTotal += backendRatings[i].rating;
@@ -109,8 +132,14 @@ const Account: React.FC = () => {
   useEffect(() => {
     let isMounted = true; // note this flag denote mount status
     if (sessionContext.loginSession === '') {
-      history.push('/login');
+      if (history) history.push('/login');
     }
+    console.log('TEST');
+    return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
+  }, [sessionContext.loginSession]);
+
+  useEffect(() => {
+    let isMounted = true; // note this flag denote mount status
     Requests.getUserRatings(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
       const results = r.data;
 
@@ -121,28 +150,33 @@ const Account: React.FC = () => {
         calculateAverageBackend();
       }
     });
+    return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
+  }, [calculateAverageBackend, calculateAverageFrontend, calculateAverageRating, sessionContext.loginSession, userContext.currentUser.id]);
+
+  useEffect(() => {
+    let isMounted = true; // note this flag denote mount status
     Requests.getRatingsCreated(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
       const results = r.data;
       if (isMounted) setUserCreatedRatings(results.data);
     });
     return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
-  });
+  }, [sessionContext.loginSession, userContext.currentUser.id])
 
   return (
     <section className={classes.accountPage}>
       <section className={classes.profile}>
         <img src={ProfilePlaceholder} alt='Profile Image' title='Profile Image' className={classes.profileImage} />
         <article>
-          <Typography variant='h1'>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
-          <Typography variant='h2'>{userContext.currentUser.role}</Typography>
-          <Typography>Overall Rating: {overallRating}</Typography>
+          <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
+          <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
+          <Typography className={classes.rating}>Overall Rating: {overallRating}</Typography>
         </article>
       </section>
       <section>
         <Button onClick={() => setShowCreatedReviews(false)} className={!showCreatedReviews ? classes.activeButton : ''}>Rating Categories</Button>
         <Button onClick={() => setShowCreatedReviews(true)} className={showCreatedReviews ? classes.activeButton : ''}>Ratings Given</Button>
         {!showCreatedReviews ?
-          <section>
+          <section className={classes.categoriesSection}>
             <Typography>Frontend: {averageFrontendRating ? averageFrontendRating : 'No Ratings'}</Typography>
             <Typography>Backend: {averageBackendRating ? averageBackendRating : 'No Ratings'}</Typography>
           </section> :
