@@ -49,7 +49,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     getAuthToken();
-  });
+  }, []);
 
   return (
     <section className='App'>

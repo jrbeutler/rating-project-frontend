@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'center',
       backgroundColor: '#85CAB0',
       width: '100%',
-      height: '100%',
+      height: '100vh',
     },
   }),
 );
@@ -71,6 +71,7 @@ const Account: React.FC = () => {
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>({});
   const [overallRating, setOverallRating] = useState<number>(0);
   const [averageFrontendRating, setAverageFrontendRating] = useState<number>(0);
+  const [averageBackendRating, setAverageBackendRating] = useState<number>(0);
   const [showCreatedReviews, setShowCreatedReviews] = useState<boolean>(false);
 
   const calculateAverageRating = () => {
@@ -94,19 +95,37 @@ const Account: React.FC = () => {
     }
   }
 
+  const calculateAverageBackend = () => {
+    let ratingTotal = 0;
+    if (receivedRatings.userRatings) {
+      const backendRatings = receivedRatings.userRatings.filter(rating => rating.category === 'BACKEND');
+      for (let i = 0; i < backendRatings.length; i++) {
+        ratingTotal += backendRatings[i].rating;
+      }
+      setAverageBackendRating(ratingTotal / backendRatings.length);
+    }
+  }
+
   useEffect(() => {
+    let isMounted = true; // note this flag denote mount status
     if (sessionContext.loginSession === '') {
       history.push('/login');
     }
     Requests.getUserRatings(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
       const results = r.data;
-      setReceivedRatings(results.data);
-      calculateAverageRating();
+
+      if (isMounted) {
+        setReceivedRatings(results.data);
+        calculateAverageRating();
+        calculateAverageFrontend();
+        calculateAverageBackend();
+      }
     });
     Requests.getRatingsCreated(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
       const results = r.data;
-      setUserCreatedRatings(results.data);
-    })
+      if (isMounted) setUserCreatedRatings(results.data);
+    });
+    return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
   });
 
   return (
@@ -124,7 +143,8 @@ const Account: React.FC = () => {
         <Button onClick={() => setShowCreatedReviews(true)} className={showCreatedReviews ? classes.activeButton : ''}>Ratings Given</Button>
         {!showCreatedReviews ?
           <section>
-            <Typography>Frontend: {averageFrontendRating}</Typography>
+            <Typography>Frontend: {averageFrontendRating ? averageFrontendRating : 'No Ratings'}</Typography>
+            <Typography>Backend: {averageBackendRating ? averageBackendRating : 'No Ratings'}</Typography>
           </section> :
           <section className={classes.userReviewedSection}>
             {(userCreatedRatings.userReviewedRatings && userCreatedRatings.userReviewedRatings.length > 0) &&
