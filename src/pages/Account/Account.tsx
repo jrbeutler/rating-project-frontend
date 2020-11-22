@@ -66,6 +66,17 @@ const Account: React.FC = () => {
   const history = useHistory();
   const [receivedRatings, setReceivedRatings] = useState<UserRatings>({});
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>({});
+  const [overallRating, setOverallRating] = useState<number>(0);
+
+  const calculateAverageRating = () => {
+    let ratingTotal = 0;
+    if (receivedRatings.userRatings) {
+      for (let i = 0; i < receivedRatings.userRatings.length; i++) {
+        ratingTotal += receivedRatings.userRatings[i].rating;
+      }
+      setOverallRating(ratingTotal / receivedRatings.userRatings?.length);
+    }
+  };
 
   useEffect(() => {
     if (sessionContext.loginSession === '') {
@@ -74,13 +85,13 @@ const Account: React.FC = () => {
     Requests.getUserRatings(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
       const results = r.data;
       setReceivedRatings(results.data);
+      calculateAverageRating();
     });
     Requests.getRatingsCreated(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
       const results = r.data;
-      console.log(results);
       setUserCreatedRatings(results.data);
     })
-  }, [history, sessionContext.loginSession, userContext.currentUser.id]);
+  }, [calculateAverageRating, history, sessionContext.loginSession, userContext.currentUser.id]);
 
   return (
     <section className={classes.accountPage}>
@@ -89,7 +100,7 @@ const Account: React.FC = () => {
         <article>
           <Typography variant='h1'>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2'>{userContext.currentUser.role}</Typography>
-          <Typography>Overall Rating:</Typography>
+          <Typography>Overall Rating: {overallRating}</Typography>
         </article>
       </section>
       <section>
