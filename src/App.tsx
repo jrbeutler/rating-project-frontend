@@ -43,7 +43,9 @@ const App: React.FC = () => {
       <AuthContext.Provider value={{ loginSession, setLoginSession }}>
         <UserContext.Provider value={{ currentUser, setCurrentUser }}>
           <Router>
-            <Header />
+            {loginSession !== '' &&
+              <Header />
+            }
             <Switch>
               <Route exact path={'/login'} component={Login} />
               <Route exact path={'/rate'} component={Rate} />

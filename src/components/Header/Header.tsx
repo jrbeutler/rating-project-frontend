@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { fade, makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import React from "react";
+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -7,27 +7,42 @@ import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import MenuIcon from '@material-ui/icons/Menu';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import { NavLink } from 'react-router-dom';
-import { AuthContext } from "../../App";
 import logo from '../../assets/EduSource Logo_RGB_clr.png';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    header: {
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
     grow: {
       flexGrow: 1,
     },
     menuButton: {
       marginRight: theme.spacing(2),
     },
-    title: {
-      display: 'none',
-      [theme.breakpoints.up('sm')]: {
-        display: 'block',
-      },
+    logo: {
+      width: '15rem',
+      marginBottom: '0.5rem',
     },
     link: {
       marginRight: '1rem',
+      fontSize: '1.25rem',
+      color: '#FFFFFF',
+      textDecoration: 'none',
+      borderBottom: '#FFFFFF 1.5px solid',
+    },
+    mobileLink: {
+      marginRight: '1rem',
+      fontSize: '1.25rem',
+      color: '#000000',
+    },
+    activeLink: {
+      marginRight: '1rem',
+      fontSize: '1.25rem',
+      color: '#F7931E',
+      textDecoration: 'none',
+      borderBottom: '#F7931E 1.5px solid',
     },
     sectionDesktop: {
       display: 'none',
@@ -46,24 +61,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Header: React.FC = () => {
   const classes = useStyles();
-  const authContext = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
   const handleMenuClose = () => {
     setAnchorEl(null);
-    handleMobileMenuClose();
   };
 
   const menuId = 'primary-search-account-menu';
@@ -77,57 +84,24 @@ const Header: React.FC = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}><NavLink to='/rate'>Rate</NavLink></MenuItem>
-      <MenuItem onClick={handleMenuClose}><NavLink to='/'>Profile</NavLink></MenuItem>
-    </Menu>
-  );
-
-  const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <p>Messages</p>
+      <MenuItem onClick={handleMenuClose}>
+        <NavLink exact to='/rate' className={classes.mobileLink} activeClassName={classes.activeLink}>Rate</NavLink>
       </MenuItem>
-      <MenuItem>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
+      <MenuItem onClick={handleMenuClose}>
+        <NavLink exact to='/' className={classes.mobileLink} activeClassName={classes.activeLink}>Profile</NavLink>
       </MenuItem>
     </Menu>
   );
 
   return (
     <div className={classes.grow}>
-      <AppBar position="static">
+      <AppBar position="static" className={classes.header}>
         <Toolbar>
-          <Typography className={classes.title} variant="h6" noWrap>
-            Material-UI
-          </Typography>
+          <img src={logo} title='EduSource' alt='EduSource' className={classes.logo} />
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            {authContext.loginSession !== '' ?
-              <>
-                <Typography className={classes.link}><NavLink to='/rate'>Rate</NavLink></Typography>
-                <Typography className={classes.link}><NavLink to='/'>Profile</NavLink></Typography>
-              </> :
-              <img src={logo} title='EduSource' alt='EduSource' />
-            }
+          <Typography><NavLink exact to='/rate' className={classes.link} activeClassName={classes.activeLink}>Rate</NavLink></Typography>
+          <Typography><NavLink exact to='/' className={classes.link} activeClassName={classes.activeLink}>Profile</NavLink></Typography>
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
@@ -143,7 +117,6 @@ const Header: React.FC = () => {
           </div>
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
       {renderMenu}
     </div>
   );
