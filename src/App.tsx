@@ -1,6 +1,7 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
+import Header from './components/Header/Header';
 import Account from './pages/Account/Account';
 import Login from './pages/Login/Login';
 import Rate from './pages/Rate/Rate';
@@ -34,6 +35,7 @@ const App: React.FC = () => {
       <AuthContext.Provider value={{ loginSession, setLoginSession }}>
         <UserContext.Provider value={{ currentUser, setCurrentUser }}>
           <Router>
+            <Header />
             <Switch>
               <Route exact path={'/'} component={Account} />
               <Route exact path={'/login'} component={Login} />
