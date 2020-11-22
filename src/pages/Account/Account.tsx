@@ -5,6 +5,7 @@ import { AuthContext, UserContext } from '../../App';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 import Requests from "../../utils/Requests";
+import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
 
 type UserRatings = {
   userRatings?: [{
@@ -87,7 +88,12 @@ const Account: React.FC = () => {
           }
           {(userCreatedRatings.userReviewedRatings && userCreatedRatings.userReviewedRatings.length > 0) &&
           userCreatedRatings.userReviewedRatings.map((rating) => {
-            return <p key={rating.id}>{rating.category}</p>
+            return <CreatedRatingCard
+              reviewedID={rating.reviewedID}
+              reviewerID={rating.reviewerID}
+              category={rating.category}
+              rating={rating.rating}
+              notes={rating.notes ?? rating.notes}/>
           })
           }
         </article>
