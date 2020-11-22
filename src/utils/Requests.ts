@@ -1,9 +1,10 @@
 import axios from 'axios';
+import config from "../config";
 
 export default class Requests {
   static login = async (email: string, password: string) => {
     const promise = await axios({
-      url: 'http://localhost:3000/graphql',
+      url: config.apiURL,
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
@@ -30,7 +31,7 @@ export default class Requests {
 
   static rate = async (sessionToken: string, reviewerID: string, reviewedID: string, category: string, rating: number, notes: string) =>{
     const promise = await axios({
-      url: 'http://localhost:3000/graphql',
+      url: config.apiURL,
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
@@ -62,7 +63,7 @@ export default class Requests {
 
   static getAllUsers =  (sessionToken: string) => {
     const promise = axios({
-      url: 'http://localhost:3000/graphql',
+      url: config.apiURL,
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ export default class Requests {
 
   static getUserByID = (sessionToken: string, userID: string) => {
     const promise = axios({
-      url: 'http://localhost:3000/graphql',
+      url: config.apiURL,
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +112,7 @@ export default class Requests {
 
   static getCurrentUser = (sessionToken: string) => {
     axios({
-      url: 'http://localhost:3000/graphql',
+      url: config.apiURL,
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -140,7 +141,7 @@ export default class Requests {
 
   static getUserRatings = (sessionToken: string, userID: string) => {
     const promise = axios({
-      url: 'http://localhost:3000/graphql',
+      url: config.apiURL,
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
@@ -166,7 +167,7 @@ export default class Requests {
 
   static getRatingsCreated = (sessionToken: string, userID: string) => {
     const promise = axios({
-      url: 'http://localhost:3000/graphql',
+      url: config.apiURL,
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
