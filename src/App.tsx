@@ -1,6 +1,7 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
+import Header from './components/Header/Header';
 import Account from './pages/Account/Account';
 import Login from './pages/Login/Login';
 import Rate from './pages/Rate/Rate';
@@ -8,6 +9,9 @@ import Rate from './pages/Rate/Rate';
 type User = {
   id: string;
   email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
 }
 
 export const AuthContext = React.createContext({
@@ -19,6 +23,9 @@ export const UserContext = React.createContext({
   currentUser: {
     id: '',
     email: '',
+    firstName: '',
+    lastName: '',
+    role: ''
   },
   setCurrentUser(user: {}) {},
 });
@@ -26,7 +33,7 @@ export const UserContext = React.createContext({
 
 const App: React.FC = () => {
   const [loginSession, setLoginSession] = useState<string>('');
-  const [currentUser, setCurrentUser] = useState<User>({id: '', email: ''});
+  const [currentUser, setCurrentUser] = useState<User>({id: '', email: '', firstName: '', lastName: '', role: ''});
 
   const getAuthToken = () => {
     const token = window.sessionStorage.getItem('ratingToken');
@@ -42,6 +49,9 @@ const App: React.FC = () => {
       <AuthContext.Provider value={{ loginSession, setLoginSession }}>
         <UserContext.Provider value={{ currentUser, setCurrentUser }}>
           <Router>
+            {loginSession !== '' &&
+              <Header />
+            }
             <Switch>
               <Route exact path={'/login'} component={Login} />
               <Route exact path={'/rate'} component={Rate} />

@@ -94,7 +94,10 @@ export default class Requests {
         query {
           me {
             id,
-            email
+            email,
+            firstname,
+            lastname,
+            role
           }
         }
         `
