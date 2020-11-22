@@ -17,16 +17,16 @@ type UserRatings = {
   }];
 }
 
-type Ratings = [
-  {
+type UserCreatedRatings = {
+  userReviewedRatings?: [{
     id: string,
     category: string,
     reviewedID: string,
     reviewerID: string,
     rating: number,
     notes: string,
-  }
-];
+  }];
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,6 +55,7 @@ const Account: React.FC = () => {
   const userContext = useContext(UserContext);
   const history = useHistory();
   const [receivedRatings, setReceivedRatings] = useState<UserRatings>({});
+  const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>({});
 
   useEffect(() => {
     if (sessionContext.loginSession === '') {
@@ -64,9 +65,12 @@ const Account: React.FC = () => {
       const results = r.data;
       setReceivedRatings(results.data);
     });
+    Requests.getRatingsCreated(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
+      const results = r.data;
+      console.log(results);
+      setUserCreatedRatings(results.data);
+    })
   }, [history, sessionContext.loginSession, userContext.currentUser.id]);
-
-  console.log(userContext.currentUser);
 
   return (
     <section className={classes.accountPage}>
@@ -80,6 +84,11 @@ const Account: React.FC = () => {
             receivedRatings.userRatings.map((rating) => {
               return <p key={rating.id}>{rating.category}</p>
             })
+          }
+          {(userCreatedRatings.userReviewedRatings && userCreatedRatings.userReviewedRatings.length > 0) &&
+          userCreatedRatings.userReviewedRatings.map((rating) => {
+            return <p key={rating.id}>{rating.category}</p>
+          })
           }
         </article>
       </section>

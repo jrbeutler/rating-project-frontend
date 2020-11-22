@@ -138,4 +138,30 @@ export default class Requests {
     });
     return promise;
   }
+
+  static getRatingsCreated = (sessionToken: string, userID: string) => {
+    const promise = axios({
+      url: 'http://localhost:3000/graphql',
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionToken.toString()}`
+      },
+      data: {
+        query: `
+        query {
+          userReviewedRatings(reviewerID: "${userID}") {
+            id,
+            reviewedID,
+            reviewerID,
+            rating,
+            category,
+            notes
+          }
+        }
+        `
+      }
+    });
+    return promise;
+  }
 }
