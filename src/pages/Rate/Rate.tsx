@@ -68,7 +68,7 @@ const Rate: React.FC = () => {
           }}
         >
           {(users.allUsers && users.allUsers.length > 0) &&
-            users.allUsers.map(user => {
+            users.allUsers.filter(user => user.id !== userContext.currentUser.id).map(user => {
             return <option key={user.id}>
               {user.firstname} {user.lastname}</option>
           })
