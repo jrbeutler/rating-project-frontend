@@ -16,6 +16,9 @@ export default class Requests {
               user {
                 id
                 email
+                firstname
+                lastname
+                role
               }
             }
           }
@@ -94,15 +97,45 @@ export default class Requests {
         query {
           me {
             id,
-            email
+            email,
+            firstname,
+            lastname,
+            role
           }
         }
         `
       }
     }).then((result) => {
+      console.log(result);
       return(result);
     }).catch((e) => {
       return(e.message);
     });
   };
+
+  static getUserRatings = (sessionToken: string, userID: string) => {
+    const promise = axios({
+      url: 'http://localhost:3000/graphql',
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionToken.toString()}`
+      },
+      data: {
+        query: `
+        query {
+          userRatings(reviewedID: "${userID}") {
+            id,
+            reviewedID,
+            reviewerID,
+            rating,
+            category,
+            notes
+          }
+        }
+        `
+      }
+    });
+    return promise;
+  }
 }

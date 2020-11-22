@@ -4,7 +4,7 @@ import TextField from '@material-ui/core/TextField';
 import { Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import Requests from '../../utils/Requests';
-import AppPreviewPanel from '../../components/AppPreviewPanel';
+import AppPreviewPanel from '../../components/AppPreviewPanel/AppPreviewPanel';
 import { AuthContext, UserContext } from '../../App';
 
 const Login: React.FC = () => {
