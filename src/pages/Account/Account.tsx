@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
     accountPage: {
       backgroundColor: '#85CAB0',
       width: '100%',
-      height: '100vh',
+      height: '100%',
     },
     profile: {
       display: 'flex',
@@ -46,6 +46,15 @@ const useStyles = makeStyles((theme: Theme) =>
     profileImage: {
       width: '20rem',
       height: 'auto',
+    },
+    userReviewedSection: {
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'nowrap',
+      justifyContent: 'center',
+      backgroundColor: '#85CAB0',
+      width: '100%',
+      height: '100%',
     },
   }),
 );
@@ -81,22 +90,27 @@ const Account: React.FC = () => {
           <Typography variant='h1'>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2'>{userContext.currentUser.role}</Typography>
           <Typography>Overall Rating:</Typography>
+        </article>
+      </section>
+      <section>
+        <section>
           {(receivedRatings.userRatings && receivedRatings.userRatings.length > 0) &&
-            receivedRatings.userRatings.map((rating) => {
-              return <p key={rating.id}>{rating.category}</p>
-            })
+          receivedRatings.userRatings.map((rating) => {
+            return <p key={rating.id}>{rating.category}</p>
+          })
           }
+        </section>
+        <section className={classes.userReviewedSection}>
           {(userCreatedRatings.userReviewedRatings && userCreatedRatings.userReviewedRatings.length > 0) &&
           userCreatedRatings.userReviewedRatings.map((rating) => {
             return <CreatedRatingCard
               reviewedID={rating.reviewedID}
-              reviewerID={rating.reviewerID}
               category={rating.category}
               rating={rating.rating}
               notes={rating.notes ?? rating.notes}/>
           })
           }
-        </article>
+        </section>
       </section>
     </section>
   );
