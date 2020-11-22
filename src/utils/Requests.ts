@@ -25,7 +25,7 @@ export default class Requests {
     return promise;
   }
 
-  static rate = async (reviewerID: string, reviewedID: string, category: string, rating: number, notes: string) =>{
+  static rate = async (sessionToken: string, reviewerID: string, reviewedID: string, category: string, rating: number, notes: string) =>{
     const promise = await axios({
       url: 'http://localhost:3000/graphql',
       method: 'post',
@@ -57,8 +57,8 @@ export default class Requests {
     return promise
   }
 
-  static getAllUsers = (sessionToken: string) => {
-    axios({
+  static getAllUsers =  (sessionToken: string) => {
+    const promise = axios({
       url: 'http://localhost:3000/graphql',
       method: 'post',
       headers: {
@@ -77,11 +77,8 @@ export default class Requests {
         }
         `
       }
-    }).then((result) => {
-      return(result);
-    }).catch((e) => {
-      return(e.message);
     });
+    return promise;
   }
 
   static getCurrentUser = (sessionToken: string) => {

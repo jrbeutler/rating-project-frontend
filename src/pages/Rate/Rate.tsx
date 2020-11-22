@@ -3,6 +3,7 @@ import { AuthContext, UserContext } from "../../App";
 import { useHistory } from "react-router-dom";
 import { FormLabel } from "@material-ui/core";
 import Select from '@material-ui/core/Select';
+import Requests from '../../utils/Requests';
 
 const Rate: React.FC = () => {
   const sessionContext = useContext(AuthContext);
@@ -12,6 +13,8 @@ const Rate: React.FC = () => {
     reviewedID: "",
     Category: "",
   });
+  let users: any[] = [];
+
   const handleChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
     const name = event.target.name as keyof typeof state;
     setState({
@@ -26,6 +29,15 @@ const Rate: React.FC = () => {
     }
   });
 
+  useEffect(() => {
+    Requests.getAllUsers(sessionContext.loginSession).then((r) => {
+      console.log(r);
+      const results = r.data;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      users = results.data;
+      console.log(users);
+    });
+  })
 
 
   return (
@@ -41,12 +53,16 @@ const Rate: React.FC = () => {
           value={state.reviewedID}
           onChange={handleChange}
           inputProps={{
-            name: "Apprentice",
-            id: 'Apprentice',
+            firstname: "",
+            lastname: "",
+            id: 'reviewedID',
           }}
         >
-          <option value="">Select an Apprentice:</option>
-          <option value={'Bart Simpson'}>Bart Simpson</option>
+          {users.map(user => {
+            return <option key={user.id}>
+              {user.firstname} {user.lastname}</option>
+          })
+          }
         </Select>
       </form>
       <form>
