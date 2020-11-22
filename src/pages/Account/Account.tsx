@@ -47,6 +47,9 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '20rem',
       height: 'auto',
     },
+    activeButton: {
+      color: '#FFFFFF',
+    },
     userReviewedSection: {
       display: 'flex',
       flexDirection: 'column',
@@ -67,6 +70,7 @@ const Account: React.FC = () => {
   const [receivedRatings, setReceivedRatings] = useState<UserRatings>({});
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>({});
   const [overallRating, setOverallRating] = useState<number>(0);
+  const [averageFrontendRating, setAverageFrontendRating] = useState<number>(0);
   const [showCreatedReviews, setShowCreatedReviews] = useState<boolean>(false);
 
   const calculateAverageRating = () => {
@@ -78,6 +82,17 @@ const Account: React.FC = () => {
       setOverallRating(ratingTotal / receivedRatings.userRatings?.length);
     }
   };
+
+  const calculateAverageFrontend = () => {
+    let ratingTotal = 0;
+    if (receivedRatings.userRatings) {
+      const frontendRatings = receivedRatings.userRatings.filter(rating => rating.category === 'FRONTEND');
+      for (let i = 0; i < frontendRatings.length; i++) {
+        ratingTotal += frontendRatings[i].rating;
+      }
+      setAverageFrontendRating(ratingTotal / frontendRatings.length);
+    }
+  }
 
   useEffect(() => {
     if (sessionContext.loginSession === '') {
@@ -92,7 +107,7 @@ const Account: React.FC = () => {
       const results = r.data;
       setUserCreatedRatings(results.data);
     })
-  }, [calculateAverageRating, history, sessionContext.loginSession, userContext.currentUser.id]);
+  });
 
   return (
     <section className={classes.accountPage}>
@@ -105,15 +120,11 @@ const Account: React.FC = () => {
         </article>
       </section>
       <section>
-        <Button onClick={() => setShowCreatedReviews(false)}>Rating Categories</Button>
-        <Button onClick={() => setShowCreatedReviews(true)}>Ratings Given</Button>
-        {showCreatedReviews ?
+        <Button onClick={() => setShowCreatedReviews(false)} className={!showCreatedReviews ? classes.activeButton : ''}>Rating Categories</Button>
+        <Button onClick={() => setShowCreatedReviews(true)} className={showCreatedReviews ? classes.activeButton : ''}>Ratings Given</Button>
+        {!showCreatedReviews ?
           <section>
-            {(receivedRatings.userRatings && receivedRatings.userRatings.length > 0) &&
-            receivedRatings.userRatings.map((rating) => {
-              return <p key={rating.id}>{rating.category}</p>
-            })
-            }
+            <Typography>Frontend: {averageFrontendRating}</Typography>
           </section> :
           <section className={classes.userReviewedSection}>
             {(userCreatedRatings.userReviewedRatings && userCreatedRatings.userReviewedRatings.length > 0) &&

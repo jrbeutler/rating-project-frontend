@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from 'react-router-dom';
 import Requests from "../../utils/Requests";
 import { AuthContext } from "../../App";
-import { Card, CardContent, createStyles, Theme, Typography } from "@material-ui/core";
+import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 type RatingProps = {
@@ -47,7 +47,7 @@ const CreatedRatingCard: React.FC<RatingProps> = ({
       const user = r.data.data.userByID;
       setReviewedName(user.firstname + ' ' + user.lastname);
     })
-  }, [history, reviewedID, sessionContext.loginSession]);
+  });
 
   return (
     <article className={classes.reviewedCard}>
