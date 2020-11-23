@@ -29,7 +29,7 @@ export default class Requests {
     return promise;
   }
 
-  static rate = async (sessionToken: string, reviewerID: string, reviewedID: string, category: string, rating: number, notes: string) =>{
+  static refreshToken = async (sessionToken: string) =>{
     const promise = await axios({
       url: config.apiURL,
       method: 'post',
@@ -39,12 +39,35 @@ export default class Requests {
       data: {
         query: `
         mutation {
+          refreshToken(
+            token: "${sessionToken}"
+          ) {
+            accessToken
+            refreshToken
+          }
+        }`
+      }
+    });
+    return promise
+  }
+
+  static rate = async (sessionToken: string, reviewerID: string, reviewedID: string, category: string, rating: number, notes: string) =>{
+    const promise = await axios({
+      url: config.apiURL,
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionToken}`
+      },
+      data: {
+        query: `
+        mutation {
           createRating(
             data: {
               reviewedID: "${reviewedID}"
               reviewerID: "${reviewerID}"
               category: "${category}"
-              rating: "${rating}"
+              rating: ${rating}
               notes: "${notes}"
             }
           ) {
