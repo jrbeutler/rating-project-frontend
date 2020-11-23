@@ -29,12 +29,35 @@ export default class Requests {
     return promise;
   }
 
-  static rate = async (sessionToken: string, reviewerID: string, reviewedID: string, category: string, rating: number, notes: string) =>{
+  static refreshToken = async (sessionToken: string) =>{
     const promise = await axios({
       url: config.apiURL,
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
+      },
+      data: {
+        query: `
+        mutation {
+          refreshToken(
+            token: "${sessionToken}"
+          ) {
+            accessToken
+            refreshToken
+          }
+        }`
+      }
+    });
+    return promise
+  }
+
+  static rate = async (sessionToken: string, reviewerID: string, reviewedID: string, category: string, rating: number, notes: string) =>{
+    const promise = await axios({
+      url: config.apiURL,
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionToken}`
       },
       data: {
         query: `

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext, UserContext } from "../../App";
 import { useHistory } from "react-router-dom";
-import { FormLabel } from "@material-ui/core";
+import { Button, FormLabel } from "@material-ui/core";
 import Select from '@material-ui/core/Select';
 import Requests from '../../utils/Requests';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
@@ -69,6 +69,8 @@ const Rate: React.FC = () => {
   });
   const [rating, setRating] = useState<number>(0);
   const [users, setUsers] = useState<AllUser>({});
+  const [selectedUserID, setSelectedUserID] = useState<string>('');
+  const [selectedUser, setSelectedUser] = useState<string>('');
   const [open, setOpen] = useState(false);
 
   const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
@@ -87,10 +89,15 @@ const Rate: React.FC = () => {
     });
   };
 
+  const handleUserChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedUser(event.target.value as string);
+  };
+
   const submitRating = () => {
     let results;
-    Requests.rate(sessionContext.loginSession, userContext.currentUser.id, state.reviewedID, state.category, rating, state.notes).then((r) => {
+    Requests.rate(sessionContext.loginSession, userContext.currentUser.id, selectedUserID, state.category, rating, state.notes).then((r) => {
       results = r.data;
+      console.log(results);
       if (results.data == null){
         //Show Error Popup
         return null;
@@ -118,35 +125,25 @@ const Rate: React.FC = () => {
   return (
     <section className={classes.ratePage}>
       <h1>Rate an Apprentice</h1>
-      <section className={classes.rateBox}>
       <form>
         <FormLabel required className={classes.formLabels} >Apprentice</FormLabel>
-      </form>
-        <form>
         <Select
           className={classes.selectBox}
-          native
           required
-          value={state.reviewedID}
-          onChange={handleChange}
-          inputProps={{
-            firstname: "",
-            lastname: "",
-            id: 'reviewedID',
-          }}
+          value={selectedUser}
+          defaultValue=''
         >
           {(users.allUsers && users.allUsers.length > 0) &&
             users.allUsers.filter(user => user.id !== userContext.currentUser.id).map(user => {
-            return <option key={user.id}>
+            return <option key={user.id} onClick={() => {
+              setSelectedUser(user.firstname + ' ' + user.lastname)
+              setSelectedUserID(user.id);
+            }}>
               {user.firstname} {user.lastname}</option>
           })
           }
         </Select>
-      </form>
-      <form>
         <FormLabel required className={classes.formLabels}>Category</FormLabel>
-      </form>
-        <form>
         <Select
           className={classes.selectBox}
           native
@@ -162,11 +159,7 @@ const Rate: React.FC = () => {
           <option value={'FRONTEND'}>FRONTEND</option>
           <option value={"BACKEND"}>BACKEND</option>
         </Select>
-      </form>
-        <form>
-          <FormLabel required className={classes.formLabels}>Rating</FormLabel>
-        </form>
-      <form>
+        <FormLabel required className={classes.formLabels}>Rating</FormLabel>
         <TextField
           className={classes.ratingTextField}
           id="standard-number"
@@ -183,8 +176,6 @@ const Rate: React.FC = () => {
           onChange={(event) => setRating(parseInt(event.target.value))}
         >
         </TextField>
-      </form>
-      <form>
         <textarea
           rows={10}
           cols={40}
@@ -193,15 +184,15 @@ const Rate: React.FC = () => {
         >
         </textarea>
       </form>
-      <button onClick={() => submitRating()}>Submit</button>
-      </section>
-      <form>
+        <Button onClick={(e) => {
+          e.preventDefault();
+          submitRating();
+        }}>Submit</Button>
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
           <Alert onClose={handleClose} severity="success">
             Successful!
           </Alert>
         </Snackbar>
-      </form>
     </section>
   );
 }

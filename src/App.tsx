@@ -50,8 +50,9 @@ const App: React.FC = () => {
         if (isMounted && user) setCurrentUser(user.me);
       });
     }
+    console.log("LOGIN TIME!");
     return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
-  });
+  }, [loginSession]);
 
   return (
     <section className='App'>
