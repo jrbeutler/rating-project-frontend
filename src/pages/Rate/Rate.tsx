@@ -7,6 +7,12 @@ import Requests from '../../utils/Requests';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+
+function Alert(props: AlertProps) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 
 
 type AllUser = {
@@ -61,9 +67,17 @@ const Rate: React.FC = () => {
     category: "",
     notes: "",
   });
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState<number>(0);
   const [users, setUsers] = useState<AllUser>({});
+  const [open, setOpen] = useState(false);
 
+  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   const handleChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
     const name = event.target.name as keyof typeof state;
@@ -81,7 +95,7 @@ const Rate: React.FC = () => {
         //Show Error Popup
         return null;
       } else {
-
+        setOpen(true);
       }
     })
   }
@@ -101,8 +115,6 @@ const Rate: React.FC = () => {
     });
   }, [sessionContext.loginSession])
 
-  // @ts-ignore
-  // @ts-ignore
   return (
     <section className={classes.ratePage}>
       <h1>Rate an Apprentice</h1>
@@ -181,8 +193,15 @@ const Rate: React.FC = () => {
         >
         </textarea>
       </form>
-      <button>Submit</button>
+      <button onClick={() => submitRating()}>Submit</button>
       </section>
+      <form>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="success">
+            Successful!
+          </Alert>
+        </Snackbar>
+      </form>
     </section>
   );
 }

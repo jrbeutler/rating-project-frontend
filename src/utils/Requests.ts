@@ -43,7 +43,7 @@ export default class Requests {
               reviewedID: "${reviewedID}"
               reviewerID: "${reviewerID}"
               category: "${category}"
-              rating: "${rating}"
+              rating: ${rating}
               notes: "${notes}"
             }
           ) {
