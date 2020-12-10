@@ -85,6 +85,9 @@ const Header: React.FC = () => {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>
+        <NavLink exact to='/addUser' className={classes.mobileLink} activeClassName={classes.activeLink}>Rate</NavLink>
+      </MenuItem>
+      <MenuItem onClick={handleMenuClose}>
         <NavLink exact to='/rate' className={classes.mobileLink} activeClassName={classes.activeLink}>Rate</NavLink>
       </MenuItem>
       <MenuItem onClick={handleMenuClose}>
@@ -100,8 +103,9 @@ const Header: React.FC = () => {
           <img src={logo} title='EduSource' alt='EduSource' className={classes.logo} />
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-          <Typography><NavLink exact to='/rate' className={classes.link} activeClassName={classes.activeLink}>Rate</NavLink></Typography>
-          <Typography><NavLink exact to='/' className={classes.link} activeClassName={classes.activeLink}>Profile</NavLink></Typography>
+            <Typography><NavLink exact to='/addUser' className={classes.link} activeClassName={classes.activeLink}>Add User</NavLink></Typography>
+            <Typography><NavLink exact to='/rate' className={classes.link} activeClassName={classes.activeLink}>Rate</NavLink></Typography>
+            <Typography><NavLink exact to='/' className={classes.link} activeClassName={classes.activeLink}>Profile</NavLink></Typography>
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
