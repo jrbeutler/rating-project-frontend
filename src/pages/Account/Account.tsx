@@ -4,8 +4,8 @@ import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
 import { AuthContext, UserContext } from '../../App';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { Button, Typography } from "@material-ui/core";
-import Requests from "../../utils/Requests";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
+import { getRatingsCreated, getUserRatings } from "../../utils/requests/Rating";
 
 type UserRatings = {
   userRatings?: [{
@@ -140,7 +140,7 @@ const Account: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true; // note this flag denote mount status
-    Requests.getUserRatings(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
+    getUserRatings(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
       const results = r.data;
 
       if (isMounted) {
@@ -155,7 +155,7 @@ const Account: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true; // note this flag denote mount status
-    Requests.getRatingsCreated(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
+    getRatingsCreated(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
       const results = r.data;
       if (isMounted) setUserCreatedRatings(results.data);
     });

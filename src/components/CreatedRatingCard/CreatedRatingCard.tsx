@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from 'react-router-dom';
-import Requests from "../../utils/Requests";
 import { AuthContext } from "../../App";
 import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { getUserByID } from "../../utils/requests/User";
 
 type RatingProps = {
   category: string,
@@ -43,7 +43,7 @@ const CreatedRatingCard: React.FC<RatingProps> = ({
     if (sessionContext.loginSession === '') {
       history.push('/login');
     }
-    Requests.getUserByID(sessionContext.loginSession, reviewedID).then((r) => {
+    getUserByID(sessionContext.loginSession, reviewedID).then((r) => {
       const user = r.data.data.userByID;
       setReviewedName(user.firstname + ' ' + user.lastname);
     })
