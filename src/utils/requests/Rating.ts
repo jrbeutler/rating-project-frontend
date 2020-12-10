@@ -1,5 +1,4 @@
 import config from "../../config";
-import axios from "axios";
 
 // This file contains all network requests related to ratings.
 
