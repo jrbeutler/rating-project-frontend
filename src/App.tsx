@@ -5,6 +5,7 @@ import Header from './components/Header/Header';
 import Account from './pages/Account/Account';
 import Login from './pages/Login/Login';
 import Rate from './pages/Rate/Rate';
+import AddUser from './pages/AddUser/AddUser';
 import Requests from "./utils/Requests";
 
 type User = {
@@ -65,6 +66,7 @@ const App: React.FC = () => {
             <Switch>
               <Route exact path={'/login'} component={Login} />
               <Route exact path={'/rate'} component={Rate} />
+              <Route exact path={'/addUser'} component={AddUser} />
               <Route exact path={'/'} component={Account} />
               <Redirect from={'*'} to={'/404'} />
             </Switch>
