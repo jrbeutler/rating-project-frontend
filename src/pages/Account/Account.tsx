@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from 'react-router-dom';
+import {NavLink, useHistory} from 'react-router-dom';
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
 import { AuthContext, UserContext } from '../../App';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { Button, Typography } from "@material-ui/core";
+import {Button, Link, Typography} from "@material-ui/core";
 import Requests from "../../utils/Requests";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
 
@@ -78,6 +78,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     categoriesSection: {
       backgroundColor: '#85CAB0',
+    },
+    link: {
+      marginRight: '1rem',
+      fontSize: '1rem',
+      color: '#000000',
+      textDecoration: 'none',
+      textAlign: 'right',
+
     },
   }),
 );
@@ -170,6 +178,9 @@ const Account: React.FC = () => {
           <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
           <Typography className={classes.rating}>Overall Rating: {overallRating}</Typography>
+          <NavLink exact to='/addCategory' className={classes.link}>
+            <button>Add Category</button>
+          </NavLink>
         </article>
       </section>
       <section>
