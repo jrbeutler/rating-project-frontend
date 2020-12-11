@@ -6,6 +6,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import {Button, Link, Typography} from "@material-ui/core";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
 import { getRatingsCreated, getUserRatings } from "../../utils/requests/Rating";
+import { getCurrentUser } from "../../utils/requests/User";
 
 type UserRatings = {
   userRatings?: [{
@@ -152,15 +153,23 @@ const Account: React.FC = () => {
   }, [calculateAverageBackend, calculateAverageFrontend, calculateAverageRating, sessionToken, userContext.currentUser.id]);
 
   useEffect(() => {
+    let isMounted = true; // note this flag denote mount status
     getRatingsCreated(sessionToken, userContext.currentUser.id).then((r) => {
       const results = r.data;
-      setUserCreatedRatings(results.userReviewedRatings);
+      if (isMounted) setUserCreatedRatings(results.userReviewedRatings);
     });
+    return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
   }, [])
 
   useEffect(() => {
-    if(sessionToken === '') {
-      history.push('/login');
+    if (sessionToken) {
+      getCurrentUser(sessionToken).then(r => {
+        if (r.data) {
+          userContext.setCurrentUser(r.data.me);
+        } else {
+          history.push('/login');
+        }
+      });
     }
   }, []);
 
