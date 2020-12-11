@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AuthContext, UserContext } from "../../App";
+import { UserContext } from "../../App";
 import { useHistory } from "react-router-dom";
 import { Button, FormLabel } from "@material-ui/core";
 import Select from '@material-ui/core/Select';
-import Requests from '../../utils/Requests';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import { rate } from "../../utils/requests/Rating";
+import { getAllUsers } from "../../utils/requests/User";
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -15,15 +16,13 @@ function Alert(props: AlertProps) {
 
 
 
-type AllUser = {
-  allUsers?: [{
+type AllUser = [{
     id: string,
     email: string,
     firstname: string,
     lastname: string,
     role: string,
-  }];
-}
+}];
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -59,7 +58,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Rate: React.FC = () => {
   const classes = useStyles();
-  const sessionContext = useContext(AuthContext);
   const userContext = useContext(UserContext);
   const history = useHistory();
   const [state, setState] = React.useState({
@@ -68,10 +66,18 @@ const Rate: React.FC = () => {
     notes: "",
   });
   const [rating, setRating] = useState<number>(0);
-  const [users, setUsers] = useState<AllUser>({});
+  const [users, setUsers] = useState<AllUser>();
   const [selectedUserID, setSelectedUserID] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [open, setOpen] = useState(false);
+
+  const sessionToken = window.sessionStorage.getItem('ratingToken');
+
+  useEffect(() => {
+    if(sessionToken === '') {
+      history.push('/login');
+    }
+  }, []);
 
   const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
     if (reason === 'clickaway') {
@@ -95,10 +101,10 @@ const Rate: React.FC = () => {
 
   const submitRating = () => {
     let results;
-    Requests.rate(sessionContext.loginSession, userContext.currentUser.id, selectedUserID, state.category, rating, state.notes).then((r) => {
+    rate(sessionToken, userContext.currentUser.id, selectedUserID, state.category, rating, state.notes).then((r) => {
+      console.log(r);
       results = r.data;
-      console.log(results);
-      if (results.data == null){
+      if (results == null){
         //Show Error Popup
         return null;
       } else {
@@ -107,20 +113,24 @@ const Rate: React.FC = () => {
     })
   }
 
+  const populateUsers = async () => {
+    getAllUsers(sessionToken).then((r) => {
+      const results = r.data;
+      setUsers(results.allUsers);
+    });
+  }
+
   useEffect(() => {
-    if (sessionContext.loginSession === '') {
+    if (sessionToken === '') {
       history.push('/login');
     }
   });
 
   useEffect(() => {
-    Requests.getAllUsers(sessionContext.loginSession).then((r) => {
-      console.log(r);
-      const results = r.data;
-      setUsers(results.data);
-      console.log(users);
-    });
-  }, [sessionContext.loginSession])
+    populateUsers();
+  }, [])
+
+  console.log(users);
 
   return (
     <section className={classes.ratePage}>
@@ -133,8 +143,8 @@ const Rate: React.FC = () => {
           value={selectedUser}
           defaultValue=''
         >
-          {(users.allUsers && users.allUsers.length > 0) &&
-            users.allUsers.filter(user => user.id !== userContext.currentUser.id).map(user => {
+          {(users && users.length > 0) &&
+            users.filter(user => user.id !== userContext.currentUser.id).map(user => {
             return <option key={user.id} onClick={() => {
               setSelectedUser(user.firstname + ' ' + user.lastname)
               setSelectedUserID(user.id);

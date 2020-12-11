@@ -5,7 +5,7 @@ import Header from './components/Header/Header';
 import Account from './pages/Account/Account';
 import Login from './pages/Login/Login';
 import Rate from './pages/Rate/Rate';
-import Requests from "./utils/Requests";
+import { getCurrentUser } from "./utils/requests/User";
 
 type User = {
   id: string;
@@ -14,11 +14,6 @@ type User = {
   lastname: string;
   role: string;
 }
-
-export const AuthContext = React.createContext({
-  loginSession: '',
-  setLoginSession(accessToken: string) {},
-});
 
 export const UserContext = React.createContext({
   currentUser: {
@@ -33,33 +28,27 @@ export const UserContext = React.createContext({
 
 
 const App: React.FC = () => {
-  const [loginSession, setLoginSession] = useState<string>('');
   const [currentUser, setCurrentUser] = useState<User>({id: '', email: '', firstname: '', lastname: '', role: ''});
-  const history = useHistory();
+  const sessionToken = window.sessionStorage.getItem('ratingToken');
+
+  const populateUserContext = async () => {
+    if (sessionToken) {
+      const user = await getCurrentUser(sessionToken);
+      if (user.data) {
+        setCurrentUser(user.data.me);
+      }
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true; // note this flag denote mount status
-    const token = window.sessionStorage.getItem('ratingToken');
-    if (token) {
-      if (isMounted) setLoginSession(token);
-      Requests.getCurrentUser(token).then((r) => {
-        const user = r.data.data;
-        if (user == null) {
-          if (history) history.push('/login');
-        }
-        if (isMounted && user) setCurrentUser(user.me);
-      });
-    }
-    console.log("LOGIN TIME!");
-    return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
-  }, [loginSession]);
+    populateUserContext();
+  }, [])
 
   return (
     <section className='App'>
-      <AuthContext.Provider value={{ loginSession, setLoginSession }}>
         <UserContext.Provider value={{ currentUser, setCurrentUser }}>
           <Router>
-            {loginSession !== '' &&
+            {currentUser.email !== '' &&
               <Header />
             }
             <Switch>
@@ -70,7 +59,6 @@ const App: React.FC = () => {
             </Switch>
           </Router>
         </UserContext.Provider>
-      </AuthContext.Provider>
     </section>
   );
 }

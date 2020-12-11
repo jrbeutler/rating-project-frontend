@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from 'react-router-dom';
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
-import { AuthContext, UserContext } from '../../App';
+import { UserContext } from '../../App';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { Button, Typography } from "@material-ui/core";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
@@ -18,16 +18,14 @@ type UserRatings = {
   }];
 }
 
-type UserCreatedRatings = {
-  userReviewedRatings?: [{
+type UserCreatedRatings = [{
     id: string,
     category: string,
     reviewedID: string,
     reviewerID: string,
     rating: number,
     notes: string,
-  }];
-}
+}];
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -84,15 +82,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Account: React.FC = () => {
   const classes = useStyles();
-  const sessionContext = useContext(AuthContext);
   const userContext = useContext(UserContext);
   const history = useHistory();
   const [receivedRatings, setReceivedRatings] = useState<UserRatings>({});
-  const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>({});
+  const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>();
   const [overallRating, setOverallRating] = useState<number>(0);
   const [averageFrontendRating, setAverageFrontendRating] = useState<number>(0);
   const [averageBackendRating, setAverageBackendRating] = useState<number>(0);
   const [showCreatedReviews, setShowCreatedReviews] = useState<boolean>(false);
+
+  const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   const calculateAverageRating = () => {
     let ratingTotal = 0;
@@ -131,16 +130,7 @@ const Account: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true; // note this flag denote mount status
-    if (sessionContext.loginSession === '') {
-      if (history) history.push('/login');
-    }
-    console.log('TEST');
-    return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
-  }, [sessionContext.loginSession]);
-
-  useEffect(() => {
-    let isMounted = true; // note this flag denote mount status
-    getUserRatings(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
+    getUserRatings(sessionToken, userContext.currentUser.id).then((r) => {
       const results = r.data;
 
       if (isMounted) {
@@ -151,16 +141,20 @@ const Account: React.FC = () => {
       }
     });
     return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
-  }, [calculateAverageBackend, calculateAverageFrontend, calculateAverageRating, sessionContext.loginSession, userContext.currentUser.id]);
+  }, [calculateAverageBackend, calculateAverageFrontend, calculateAverageRating, sessionToken, userContext.currentUser.id]);
 
   useEffect(() => {
-    let isMounted = true; // note this flag denote mount status
-    getRatingsCreated(sessionContext.loginSession, userContext.currentUser.id).then((r) => {
+    getRatingsCreated(sessionToken, userContext.currentUser.id).then((r) => {
       const results = r.data;
-      if (isMounted) setUserCreatedRatings(results.data);
+      setUserCreatedRatings(results.userReviewedRatings);
     });
-    return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
-  }, [sessionContext.loginSession, userContext.currentUser.id])
+  }, [])
+
+  useEffect(() => {
+    if(sessionToken === '') {
+      history.push('/login');
+    }
+  }, []);
 
   return (
     <section className={classes.accountPage}>
@@ -181,8 +175,8 @@ const Account: React.FC = () => {
             <Typography>Backend: {averageBackendRating ? averageBackendRating : 'No Ratings'}</Typography>
           </section> :
           <section className={classes.userReviewedSection}>
-            {(userCreatedRatings.userReviewedRatings && userCreatedRatings.userReviewedRatings.length > 0) &&
-            userCreatedRatings.userReviewedRatings.map((rating) => {
+            {(userCreatedRatings && userCreatedRatings.length > 0) &&
+            userCreatedRatings.map((rating) => {
               return <CreatedRatingCard
                 reviewedID={rating.reviewedID}
                 category={rating.category}

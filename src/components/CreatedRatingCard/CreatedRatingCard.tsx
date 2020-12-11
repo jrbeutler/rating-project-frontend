@@ -1,6 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from 'react-router-dom';
-import { AuthContext } from "../../App";
+import React, { useEffect, useState } from "react";
 import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { getUserByID } from "../../utils/requests/User";
@@ -34,20 +32,17 @@ const CreatedRatingCard: React.FC<RatingProps> = ({
   rating,
   notes = ''
 }) => {
-  const sessionContext = useContext(AuthContext);
   const classes = useStyles();
   const [reviewedName, setReviewedName] = useState<string>('');
-  const history = useHistory();
+
+  const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
-    if (sessionContext.loginSession === '') {
-      history.push('/login');
-    }
-    getUserByID(sessionContext.loginSession, reviewedID).then((r) => {
-      const user = r.data.data.userByID;
+    getUserByID(sessionToken, reviewedID).then((r) => {
+      const user = r.data.userByID;
       setReviewedName(user.firstname + ' ' + user.lastname);
     })
-  });
+  }, []);
 
   return (
     <article className={classes.reviewedCard}>

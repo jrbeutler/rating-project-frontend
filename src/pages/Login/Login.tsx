@@ -3,39 +3,33 @@ import { useHistory } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import { Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
-import Requests from '../../utils/Requests';
 import AppPreviewPanel from '../../components/AppPreviewPanel/AppPreviewPanel';
-import { AuthContext, UserContext } from '../../App';
+import { UserContext } from '../../App';
+import { login } from "../../utils/requests/User";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const sessionContext = useContext(AuthContext);
   const userContext = useContext(UserContext);
   const history = useHistory();
 
-  const submitLogin = () => {
-    let results;
-    Requests.login(email, password).then((r) => {
-      results = r.data;
-      if (results.data == null) {
-        //Show Error Popup
-        return null;
-      } else {
-        sessionContext.setLoginSession(results.data.login.accessToken);
-        userContext.setCurrentUser(results.data.login.user);
-        window.sessionStorage.setItem('ratingToken', results.data.login.accessToken);
-        history.push('/');
-      }
-    });
-  };
-
   useEffect(() => {
-    if (sessionContext.loginSession !== '') {
-      history.push("/");
+    if (userContext.currentUser.email !== '') {
+      history.push('/');
     }
-  });
+  }, [])
+
+  const submitLogin = async () => {
+    const response = await login(email, password);
+    if (response.data == null) {
+      return null;
+    } else {
+      userContext.setCurrentUser(response.data.login.user);
+      window.sessionStorage.setItem('ratingToken', response.data.login.accessToken);
+      history.push('/');
+    }
+  };
 
   return (
     <section>

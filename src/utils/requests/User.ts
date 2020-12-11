@@ -47,12 +47,15 @@ export async function refreshToken(sessionToken: string) {
   return await response.json();
 }
 
-export async function getUserByID(sessionToken: string, userID: string) {
+export async function getUserByID(sessionToken: string | null, userID: string) {
+  if (sessionToken === '') {
+    return null;
+  }
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken.toString()}`
+      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
@@ -71,7 +74,7 @@ export async function getUserByID(sessionToken: string, userID: string) {
   return await response.json();
 }
 
-async function getCurrentUser(sessionToken: string) {
+export async function getCurrentUser(sessionToken: string) {
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
@@ -87,6 +90,32 @@ async function getCurrentUser(sessionToken: string) {
             firstname,
             lastname,
             role
+          }
+        }
+        `
+    }),
+  });
+  return await response.json();
+}
+
+export async function getAllUsers(sessionToken: string | null) {
+  if (sessionToken === '') {
+    return null;
+  }
+  const response = await fetch(config.apiURL,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        query{
+          allUsers {
+            id
+            email
+            firstname
+            lastname
           }
         }
         `

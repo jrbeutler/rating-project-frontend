@@ -3,12 +3,15 @@ import config from "../../config";
 // This file contains all network requests related to ratings.
 
 export async function rate(
-  sessionToken: string,
+  sessionToken: string | null,
   reviewerID: string,
   reviewedID: string,
   categoryID: string,
   rating: number,
   notes: string) {
+  if (sessionToken === '') {
+    return null;
+  }
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
@@ -22,7 +25,7 @@ export async function rate(
             data: {
               reviewedID: "${reviewedID}"
               reviewerID: "${reviewerID}"
-              categoryID: "${categoryID}"
+              categoryID: "ckii640fx0004dtf6brrq3w8n"
               rating: ${rating}
               notes: "${notes}"
             }
@@ -40,12 +43,15 @@ export async function rate(
   return await response.json();
 }
 
-export async function getUserRatings(sessionToken: string, userID: string) {
+export async function getUserRatings(sessionToken: string | null, userID: string) {
+  if (sessionToken === '') {
+    return null;
+  }
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken.toString()}`
+      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
@@ -65,12 +71,15 @@ export async function getUserRatings(sessionToken: string, userID: string) {
   return await response.json();
 }
 
-export async function getRatingsCreated(sessionToken: string, userID: string) {
+export async function getRatingsCreated(sessionToken: string | null, userID: string) {
+  if (sessionToken === '') {
+    return null;
+  }
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken.toString()}`
+      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
