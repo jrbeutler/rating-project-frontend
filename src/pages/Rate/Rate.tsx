@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: '#85CAB0',
       width: '100%',
       height: '100vh',
+      paddingTop: '0.5rem',
     },
     rateBox: {
       backgroundColor: '#000000',

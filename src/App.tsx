@@ -7,6 +7,7 @@ import Login from './pages/Login/Login';
 import Rate from './pages/Rate/Rate';
 import AddUser from './pages/AddUser/AddUser';
 import Requests from "./utils/Requests";
+import AddCategory from "./pages/AddCategory/AddCategory";
 
 type User = {
   id: string;
@@ -67,6 +68,7 @@ const App: React.FC = () => {
               <Route exact path={'/login'} component={Login} />
               <Route exact path={'/rate'} component={Rate} />
               <Route exact path={'/addUser'} component={AddUser} />
+              <Route exact path={'/addCategory'} component={AddCategory} />
               <Route exact path={'/'} component={Account} />
               <Redirect from={'*'} to={'/404'} />
             </Switch>
