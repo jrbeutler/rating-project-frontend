@@ -25,7 +25,7 @@ export async function rate(
             data: {
               reviewedID: "${reviewedID}"
               reviewerID: "${reviewerID}"
-              categoryID: "ckii640fx0004dtf6brrq3w8n"
+              categoryID: "${categoryID}"
               rating: ${rating}
               notes: "${notes}"
             }

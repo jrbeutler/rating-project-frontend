@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Redirect, Route, Switch, useHistory } from 'react-router-dom';
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header/Header';
 import Account from './pages/Account/Account';
@@ -7,7 +7,6 @@ import Login from './pages/Login/Login';
 import Rate from './pages/Rate/Rate';
 import { getCurrentUser } from "./utils/requests/User";
 import AddUser from './pages/AddUser/AddUser';
-import Requests from "./utils/Requests";
 import AddCategory from "./pages/AddCategory/AddCategory";
 
 type User = {
