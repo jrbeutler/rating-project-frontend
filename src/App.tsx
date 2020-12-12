@@ -28,10 +28,15 @@ export const UserContext = React.createContext({
   setCurrentUser(user: {}) {},
 });
 
+export const SessionContext = React.createContext({
+  sessionToken: '',
+  setSessionToken(token: string) {},
+})
+
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User>({id: '', email: '', firstname: '', lastname: '', role: ''});
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
+  const [sessionToken, setSessionToken] = useState<string>(window.sessionStorage.getItem('ratingToken') ?? '');
 
   const populateUserContext = async () => {
     if (sessionToken) {
@@ -48,6 +53,7 @@ const App: React.FC = () => {
 
   return (
     <section className='App'>
+        <SessionContext.Provider value={{ sessionToken, setSessionToken }}>
         <UserContext.Provider value={{ currentUser, setCurrentUser }}>
           <Router>
             {currentUser.email !== '' &&
@@ -63,6 +69,7 @@ const App: React.FC = () => {
             </Switch>
           </Router>
         </UserContext.Provider>
+        </SessionContext.Provider>
     </section>
   );
 }

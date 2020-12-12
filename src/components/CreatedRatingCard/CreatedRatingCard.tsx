@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { getUserByID } from "../../utils/requests/User";
+import { UserContext } from "../../App";
 
 type RatingProps = {
   category: string,
-  reviewedID: string,
   rating: number,
   notes?: string,
 }
@@ -28,29 +27,20 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 const CreatedRatingCard: React.FC<RatingProps> = ({
   category,
-  reviewedID,
   rating,
   notes = ''
 }) => {
   const classes = useStyles();
-  const [reviewedName, setReviewedName] = useState<string>('');
 
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
-
-  useEffect(() => {
-    getUserByID(sessionToken, reviewedID).then((r) => {
-      const user = r.data.userByID;
-      setReviewedName(user.firstname + ' ' + user.lastname);
-    })
-  }, []);
+  const userContext = useContext(UserContext);
 
   return (
-    <article className={classes.reviewedCard}>
-      <Typography variant='h4'>{reviewedName}</Typography>
+    <li className={classes.reviewedCard}>
+      <Typography variant='h4'>{userContext.currentUser.firstname + " " + userContext.currentUser.lastname}</Typography>
       <Typography><strong>Category:</strong> {category}</Typography>
       <Typography><strong>Rating:</strong> {rating}</Typography>
       <Typography>{notes}</Typography>
-    </article>
+    </li>
   );
 }
 

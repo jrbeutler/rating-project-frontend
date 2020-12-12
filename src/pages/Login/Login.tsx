@@ -4,7 +4,7 @@ import TextField from '@material-ui/core/TextField';
 import { Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import AppPreviewPanel from '../../components/AppPreviewPanel/AppPreviewPanel';
-import { UserContext } from '../../App';
+import { SessionContext, UserContext } from "../../App";
 import { login } from "../../utils/requests/User";
 
 const Login: React.FC = () => {
@@ -12,6 +12,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const userContext = useContext(UserContext);
+  const sessionContext = useContext(SessionContext);
   const history = useHistory();
 
   useEffect(() => {
@@ -27,6 +28,7 @@ const Login: React.FC = () => {
     } else {
       userContext.setCurrentUser(response.data.login.user);
       window.sessionStorage.setItem('ratingToken', response.data.login.accessToken);
+      sessionContext.setSessionToken(response.data.login.accessToken);
       history.push('/');
     }
   };
