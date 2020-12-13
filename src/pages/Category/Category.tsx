@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { getUserCategoryRatings } from "../../utils/requests/Rating";
-import { getCurrentUser, getUserByID } from "../../utils/requests/User";
+import { getCurrentUser } from "../../utils/requests/User";
 import { UserContext } from "../../App";
+import { NavLink } from "react-router-dom";
 import { Typography } from "@material-ui/core";
 import { getCategoryByID } from "../../utils/requests/Category";
 
@@ -53,7 +54,7 @@ const Category: React.FC = () => {
   return (
     <div>
       <h1>{categoryName}</h1>
-
+      <NavLink exact to='/'>&#8592; Back</NavLink>
       {(userRatings && userRatings.length > 0) &&
         userRatings.map(userRating => {
           return <section key={userRating.id}>
