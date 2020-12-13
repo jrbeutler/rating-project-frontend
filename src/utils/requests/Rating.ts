@@ -71,6 +71,40 @@ export async function getUserRatings(sessionToken: string | null, userID: string
   return await response.json();
 }
 
+export async function getUserCategoryRatings(sessionToken: string | null, userID: string, categoryID: string) {
+  if (sessionToken === '') {
+    return null;
+  }
+  const response = await fetch(config.apiURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        query {
+          userRatingsByCategory(
+            data: {
+              userID: "${userID}"
+              categoryID: "${categoryID}"
+            }
+          ) {
+            id
+            categoryID
+            createdAt
+            reviewedID
+            reviewerID
+            rating
+            notes
+          }
+        }
+        `
+    }),
+  });
+  return await response.json();
+}
+
 export async function getOverallRatingAverage(sessionToken: string | null, userID: string) {
   if (sessionToken === '') {
     return null;

@@ -111,7 +111,6 @@ const Account: React.FC = () => {
             setOverallRating(response.data.userOverallAverage);
           });
           getCategoryAverages(sessionToken, user.id).then(response => {
-            console.log(response);
             setAverageCategoryRatings(response.data.userRatingCategoryAverages);
           });
           getRatingsCreated(sessionToken, user.id).then(response => {
