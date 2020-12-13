@@ -2,20 +2,21 @@ import React, { useContext, useEffect, useState } from "react";
 import {NavLink, useHistory} from 'react-router-dom';
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
 import { UserContext } from '../../App';
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import {Button, Link, Typography} from "@material-ui/core";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
+import {Button, Typography} from "@material-ui/core";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
-import { getRatingsCreated, getUserRatings } from "../../utils/requests/Rating";
+import {
+  getCategoryAverages,
+  getOverallRatingAverage,
+  getRatingsCreated,
+} from "../../utils/requests/Rating";
 import { getCurrentUser } from "../../utils/requests/User";
 
-type UserRatings = [{
-    id: string,
-    categoryID: string,
-    reviewedID: string,
-    reviewerID: string,
-    rating: number,
-    notes: string,
-}];
+type CategoryAverages = [{
+  name: string;
+  categoryID: string;
+  average: number;
+}]
 
 type UserCreatedRatings = [{
     id: string,
@@ -26,7 +27,7 @@ type UserCreatedRatings = [{
     notes: string,
 }];
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     accountPage: {
       backgroundColor: '#85CAB0',
@@ -93,49 +94,12 @@ const Account: React.FC = () => {
   const classes = useStyles();
   const userContext = useContext(UserContext);
   const history = useHistory();
-  const [receivedRatings, setReceivedRatings] = useState<UserRatings>();
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>();
   const [overallRating, setOverallRating] = useState<number>(0);
-  const [averageFrontendRating, setAverageFrontendRating] = useState<number>(0);
-  const [averageBackendRating, setAverageBackendRating] = useState<number>(0);
+  const [averageCategoryRatings, setAverageCategoryRatings] = useState<CategoryAverages>();
   const [showCreatedReviews, setShowCreatedReviews] = useState<boolean>(false);
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
-
-  const calculateAverageRating = () => {
-    let ratingTotal = 0;
-    if (!receivedRatings) {
-      setOverallRating(0);
-    }
-    if (receivedRatings && receivedRatings) {
-      for (let i = 0; i < receivedRatings.length; i++) {
-        ratingTotal += receivedRatings[i].rating;
-      }
-      setOverallRating(ratingTotal / receivedRatings?.length);
-    }
-  };
-
-  const calculateAverageFrontend = () => {
-    let ratingTotal = 0;
-    if (receivedRatings && receivedRatings) {
-      const frontendRatings = receivedRatings.filter(rating => rating.categoryID === 'FRONTEND');
-      for (let i = 0; i < frontendRatings.length; i++) {
-        ratingTotal += frontendRatings[i].rating;
-      }
-      setAverageFrontendRating(ratingTotal / frontendRatings.length);
-    }
-  }
-
-  const calculateAverageBackend = () => {
-    let ratingTotal = 0;
-    if (receivedRatings && receivedRatings) {
-      const backendRatings = receivedRatings.filter(rating => rating.categoryID === 'BACKEND');
-      for (let i = 0; i < backendRatings.length; i++) {
-        ratingTotal += backendRatings[i].rating;
-      }
-      setAverageBackendRating(ratingTotal / backendRatings.length);
-    }
-  }
 
   useEffect(() => {
     if (sessionToken) {
@@ -143,9 +107,12 @@ const Account: React.FC = () => {
         if (response.data) {
           const user = response.data.me;
           userContext.setCurrentUser(user);
-          getUserRatings(sessionToken, user.id).then(response => {
+          getOverallRatingAverage(sessionToken, user.id).then(response => {
+            setOverallRating(response.data.userOverallAverage);
+          });
+          getCategoryAverages(sessionToken, user.id).then(response => {
             console.log(response);
-            setReceivedRatings(response.data.userRatings);
+            setAverageCategoryRatings(response.data.userRatingCategoryAverages);
           });
           getRatingsCreated(sessionToken, user.id).then(response => {
             setUserCreatedRatings(response.data.userReviewedRatings);
@@ -162,11 +129,11 @@ const Account: React.FC = () => {
   return (
     <section className={classes.accountPage}>
       <section className={classes.profile}>
-        <img src={ProfilePlaceholder} alt='Profile Image' title='Profile Image' className={classes.profileImage} />
+        <img src={ProfilePlaceholder} title='Profile' className={classes.profileImage}  alt='Profile'/>
         <article>
           <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
-          {/*<Typography className={classes.rating}>Overall Rating: {overallRating}</Typography>*/}
+          <Typography className={classes.rating}>Overall Rating: {overallRating}</Typography>
           <NavLink exact to='/addCategory' className={classes.link}>
             <button>Add Category</button>
           </NavLink>
@@ -177,8 +144,13 @@ const Account: React.FC = () => {
         <Button onClick={() => setShowCreatedReviews(true)} className={showCreatedReviews ? classes.activeButton : ''}>Ratings Given</Button>
         {!showCreatedReviews ?
           <section className={classes.categoriesSection}>
-            {/*<Typography>Frontend: {averageFrontendRating ? averageFrontendRating : 'No Ratings'}</Typography>*/}
-            {/*<Typography>Backend: {averageBackendRating ? averageBackendRating : 'No Ratings'}</Typography>*/}
+            {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
+              averageCategoryRatings.map(categoryAverage => {
+                return <Typography key={categoryAverage.categoryID}>
+                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: {categoryAverage.average}</NavLink>
+                </Typography>
+              })
+            }
           </section> :
           <section className={classes.userReviewedSection}>
             <ul className={classes.reviewedList}>
