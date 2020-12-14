@@ -166,6 +166,7 @@ export async function getRatingsCreated(sessionToken: string | null, userID: str
         query {
           userReviewedRatings(reviewerID: "${userID}") {
             id,
+            createdAt,
             reviewedID,
             reviewerID,
             rating,
