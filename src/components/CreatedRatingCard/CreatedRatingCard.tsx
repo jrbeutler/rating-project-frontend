@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from 'react-router-dom';
-import Requests from "../../utils/Requests";
-import { AuthContext } from "../../App";
 import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { UserContext } from "../../App";
+import { getUserByID } from "../../utils/requests/User";
+import { getCategoryByID } from "../../utils/requests/Category";
 
 type RatingProps = {
-  category: string,
   reviewedID: string,
+  categoryID: string,
   rating: number,
   notes?: string,
 }
@@ -29,33 +29,35 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 const CreatedRatingCard: React.FC<RatingProps> = ({
-  category,
   reviewedID,
+  categoryID,
   rating,
   notes = ''
 }) => {
-  const sessionContext = useContext(AuthContext);
   const classes = useStyles();
+
   const [reviewedName, setReviewedName] = useState<string>('');
-  const history = useHistory();
+  const [category, setCategory] = useState<string>('');
+
+  const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
-    if (sessionContext.loginSession === '') {
-      history.push('/login');
-    }
-    Requests.getUserByID(sessionContext.loginSession, reviewedID).then((r) => {
-      const user = r.data.data.userByID;
+    getUserByID(sessionToken, reviewedID).then((r) => {
+      const user = r.data.userByID;
       setReviewedName(user.firstname + ' ' + user.lastname);
-    })
-  });
+    });
+    getCategoryByID(sessionToken, categoryID).then(response => {
+      setCategory(response.data.getCategoryByID.name);
+    });
+  }, []);
 
   return (
-    <article className={classes.reviewedCard}>
+    <li className={classes.reviewedCard}>
       <Typography variant='h4'>{reviewedName}</Typography>
       <Typography><strong>Category:</strong> {category}</Typography>
       <Typography><strong>Rating:</strong> {rating}</Typography>
       <Typography>{notes}</Typography>
-    </article>
+    </li>
   );
 }
 
