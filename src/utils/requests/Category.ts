@@ -49,3 +49,27 @@ export async function getAllCategories(sessionToken: string | null) {
   });
   return await response.json();
 }
+
+export async function createCategory(sessionToken: string | null, categoryName: string) {
+  if (sessionToken === '') {
+    return null;
+  }
+  const response = await fetch(config.apiURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        mutation {
+          createCategory(name: "${categoryName}") {
+            id
+            name
+          }
+        }
+      `
+    })
+  });
+  return await response.json();
+}
