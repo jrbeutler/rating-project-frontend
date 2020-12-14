@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import {NavLink, useHistory} from 'react-router-dom';
+import { format, parseISO } from "date-fns";
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
 import { UserContext } from '../../App';
 import { createStyles, makeStyles } from "@material-ui/core/styles";
@@ -20,6 +21,7 @@ type CategoryAverages = [{
 
 type UserCreatedRatings = [{
     id: string,
+    createdAt: string,
     categoryID: string,
     reviewedID: string,
     reviewerID: string,
@@ -155,8 +157,11 @@ const Account: React.FC = () => {
             <ul className={classes.reviewedList}>
               {(userCreatedRatings && userCreatedRatings.length > 0) &&
               userCreatedRatings.map((rating) => {
+                const createdDate = parseISO(rating.createdAt);
+                const formattedDate = format(createdDate, "MM/dd/yyyy")
                 return <CreatedRatingCard
                   key={rating.id}
+                  createdAt={formattedDate}
                   reviewedID={rating.reviewedID}
                   categoryID={rating.categoryID}
                   rating={rating.rating}

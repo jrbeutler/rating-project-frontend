@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { UserContext } from "../../App";
 import { getUserByID } from "../../utils/requests/User";
 import { getCategoryByID } from "../../utils/requests/Category";
 
 type RatingProps = {
+  createdAt: string,
   reviewedID: string,
   categoryID: string,
   rating: number,
@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 const CreatedRatingCard: React.FC<RatingProps> = ({
+  createdAt,
   reviewedID,
   categoryID,
   rating,
@@ -55,6 +56,7 @@ const CreatedRatingCard: React.FC<RatingProps> = ({
     <li className={classes.reviewedCard}>
       <Typography variant='h4'>{reviewedName}</Typography>
       <Typography><strong>Category:</strong> {category}</Typography>
+      <Typography>Reviewed: {createdAt}</Typography>
       <Typography><strong>Rating:</strong> {rating}</Typography>
       <Typography>{notes}</Typography>
     </li>
