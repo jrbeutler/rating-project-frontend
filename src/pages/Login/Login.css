@@ -1,0 +1,71 @@
+.login-form {
+  display: block;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background: #000000;
+  opacity: 0.6;
+  background-size: 100% 100%;
+  position: fixed;
+}
+
+#topLogo {
+  display: flex;
+  flex-direction: row-reverse;
+  height: 200px;
+}
+
+#logo {
+  margin-top: 1em;
+  margin-right: 1.5em;
+  width: 383px;
+  height: 59.5px;
+}
+
+.wrapper {
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  flex-direction: column;
+}
+
+#welcome {
+  color: #FFFFFF;
+  font-size: 60px;
+  height: 160px;
+}
+
+.welcome {
+  display: block;
+  margin-bottom: 0.3em;
+}
+
+#emailInput {
+  margin-top: 3em;
+}
+
+#passwordInput {
+  margin-top: 3em;
+}
+
+#icon{
+  color: #85CAB0;
+}
+
+.actions {
+  margin-top: 3em;
+}
+
+#loginButton {
+  border: 2px;
+  background-color: #85CAB0;
+  color: black;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 0.5em 2em;
+  margin: 2em auto 0;
+}
