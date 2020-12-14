@@ -1,10 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { UserContext } from "../../App";
+import { getUserByID } from "../../utils/requests/User";
+import { getCategoryByID } from "../../utils/requests/Category";
 
 type RatingProps = {
-  category: string,
+  reviewedID: string,
+  categoryID: string,
   rating: number,
   notes?: string,
 }
@@ -26,17 +29,31 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 const CreatedRatingCard: React.FC<RatingProps> = ({
-  category,
+  reviewedID,
+  categoryID,
   rating,
   notes = ''
 }) => {
   const classes = useStyles();
 
-  const userContext = useContext(UserContext);
+  const [reviewedName, setReviewedName] = useState<string>('');
+  const [category, setCategory] = useState<string>('');
+
+  const sessionToken = window.sessionStorage.getItem('ratingToken');
+
+  useEffect(() => {
+    getUserByID(sessionToken, reviewedID).then((r) => {
+      const user = r.data.userByID;
+      setReviewedName(user.firstname + ' ' + user.lastname);
+    });
+    getCategoryByID(sessionToken, categoryID).then(response => {
+      setCategory(response.data.getCategoryByID.name);
+    });
+  }, []);
 
   return (
     <li className={classes.reviewedCard}>
-      <Typography variant='h4'>{userContext.currentUser.firstname + " " + userContext.currentUser.lastname}</Typography>
+      <Typography variant='h4'>{reviewedName}</Typography>
       <Typography><strong>Category:</strong> {category}</Typography>
       <Typography><strong>Rating:</strong> {rating}</Typography>
       <Typography>{notes}</Typography>

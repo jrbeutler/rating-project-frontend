@@ -20,7 +20,7 @@ type CategoryAverages = [{
 
 type UserCreatedRatings = [{
     id: string,
-    category: string,
+    categoryID: string,
     reviewedID: string,
     reviewerID: string,
     rating: number,
@@ -157,7 +157,8 @@ const Account: React.FC = () => {
               userCreatedRatings.map((rating) => {
                 return <CreatedRatingCard
                   key={rating.id}
-                  category={rating.category}
+                  reviewedID={rating.reviewedID}
+                  categoryID={rating.categoryID}
                   rating={rating.rating}
                   notes={rating.notes ?? rating.notes}/>
               })
