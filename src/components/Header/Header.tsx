@@ -85,7 +85,7 @@ const Header: React.FC = () => {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>
-        <NavLink exact to='/addUser' className={classes.mobileLink} activeClassName={classes.activeLink}>Rate</NavLink>
+        <NavLink exact to='/addUser' className={classes.mobileLink} activeClassName={classes.activeLink}>Add User</NavLink>
       </MenuItem>
       <MenuItem onClick={handleMenuClose}>
         <NavLink exact to='/rate' className={classes.mobileLink} activeClassName={classes.activeLink}>Rate</NavLink>
