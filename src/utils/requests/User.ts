@@ -124,3 +124,38 @@ export async function getAllUsers(sessionToken: string | null) {
   return await response.json();
 }
 
+export async function createUser(sessionToken: string | null,
+                                 firstName: string,
+                                 lastName: string,
+                                 email: string,
+                                 role: string,
+                                 password: string) {
+  if (sessionToken === '') {
+    return null;
+  }
+  const response = await fetch(config.apiURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        mutation {
+          createUser(data: {
+              firstname: "${firstName}",
+              lastname: "${lastName}",
+              email: "${email}",
+              role: "${role}",
+              password: "${password}" }) {
+            id
+            firstname
+            lastname
+            email
+          }
+        }
+        `
+    }),
+  });
+  return await response.json();
+}
