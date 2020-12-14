@@ -28,7 +28,7 @@ type Categories = [{
   name: string;
 }];
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     ratePage: {
       backgroundColor: '#85CAB0',
@@ -65,16 +65,12 @@ const Rate: React.FC = () => {
   const classes = useStyles();
   const userContext = useContext(UserContext);
   const history = useHistory();
-  const [state, setState] = React.useState({
-    reviewedID: "",
-    category: "",
-    notes: "",
-  });
   const [rating, setRating] = useState<number>(0);
   const [users, setUsers] = useState<AllUser>();
   const [selectedUserID, setSelectedUserID] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [categories, setCategories] = useState<Categories>();
+  const [notes, setNotes] = useState<string>('');
   const [selectedCategoryID, setSelectedCategoryID] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [open, setOpen] = useState(false);
@@ -108,21 +104,17 @@ const Rate: React.FC = () => {
     setOpen(false);
   };
 
-  const handleChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
-    const name = event.target.name as keyof typeof state;
-    setState({
-      ...state,
-      [name]: event.target.value,
-    });
-  };
-
   const handleCategoryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setSelectedCategory(event.target.value as string);
   };
 
+  const handleUserChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedUser(event.target.value as string);
+  };
+
   const submitRating = () => {
     let results;
-    rate(sessionToken, userContext.currentUser.id, selectedUserID, selectedCategoryID, rating, state.notes).then((r) => {
+    rate(sessionToken, userContext.currentUser.id, selectedUserID, selectedCategoryID, rating, notes).then((r) => {
       console.log(r);
       results = r.data;
       if (results == null){
@@ -143,15 +135,15 @@ const Rate: React.FC = () => {
           className={classes.selectBox}
           required
           value={selectedUser ? selectedUser : ''}
-          defaultValue=''
+          onChange={handleUserChange}
         >
           {(users && users.length > 0) &&
             users.filter(user => user.id !== userContext.currentUser.id).map(user => {
-            return <option key={user.id} onClick={() => {
+            return <MenuItem key={user.id} value={user.firstname + " " + user.lastname} onClick={() => {
               setSelectedUser(user.firstname + ' ' + user.lastname)
               setSelectedUserID(user.id);
             }}>
-              {user.firstname} {user.lastname}</option>
+              {user.firstname} {user.lastname}</MenuItem>
           })
           }
         </Select>
@@ -160,7 +152,7 @@ const Rate: React.FC = () => {
           <Select
             labelId="category"
             id="category-selector"
-            value={selectedCategory}
+            value={selectedCategory ? selectedCategory : ''}
             onChange={handleCategoryChange}
             className={classes.selectBox}
           >
@@ -193,8 +185,8 @@ const Rate: React.FC = () => {
         <textarea
           rows={10}
           cols={40}
-          value={state.notes}
-          onChange={handleChange}
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
         >
         </textarea>
       </form>
