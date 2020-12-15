@@ -1,36 +1,40 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AuthContext, UserContext } from "../../App";
+import { UserContext } from "../../App";
 import { useHistory } from "react-router-dom";
-import { Button, FormLabel } from "@material-ui/core";
+import { Button, FormControl, FormLabel, InputLabel, MenuItem } from "@material-ui/core";
 import Select from '@material-ui/core/Select';
-import Requests from '../../utils/Requests';
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import { rate } from "../../utils/requests/Rating";
+import { getAllUsers, getCurrentUser } from "../../utils/requests/User";
+import { getAllCategories } from "../../utils/requests/Category";
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-
-
-type AllUser = {
-  allUsers?: [{
+type AllUser = [{
     id: string,
     email: string,
     firstname: string,
     lastname: string,
     role: string,
-  }];
-}
+}];
 
-const useStyles = makeStyles((theme: Theme) =>
+type Categories = [{
+  id: string;
+  name: string;
+}];
+
+const useStyles = makeStyles(() =>
   createStyles({
     ratePage: {
       backgroundColor: '#85CAB0',
       width: '100%',
       height: '100vh',
+      paddingTop: '0.5rem',
     },
     rateBox: {
       backgroundColor: '#000000',
@@ -59,19 +63,38 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Rate: React.FC = () => {
   const classes = useStyles();
-  const sessionContext = useContext(AuthContext);
   const userContext = useContext(UserContext);
   const history = useHistory();
-  const [state, setState] = React.useState({
-    reviewedID: "",
-    category: "",
-    notes: "",
-  });
   const [rating, setRating] = useState<number>(0);
-  const [users, setUsers] = useState<AllUser>({});
+  const [users, setUsers] = useState<AllUser>();
   const [selectedUserID, setSelectedUserID] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<string>('');
+  const [categories, setCategories] = useState<Categories>();
+  const [notes, setNotes] = useState<string>('');
+  const [selectedCategoryID, setSelectedCategoryID] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [open, setOpen] = useState(false);
+
+  const sessionToken = window.sessionStorage.getItem('ratingToken');
+
+  useEffect(() => {
+    if (sessionToken) {
+      getCurrentUser(sessionToken).then(response => {
+        if (response.data) {
+          getAllUsers(sessionToken).then(result => {
+            setUsers(result.data.allUsers);
+          });
+          getAllCategories(sessionToken).then(result => {
+            setCategories(result.data.getAllCategories);
+          })
+        } else {
+          history.push('/login');
+        }
+      })
+    } else {
+      history.push('/login');
+    }
+  }, [])
 
   const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
     if (reason === 'clickaway') {
@@ -81,12 +104,8 @@ const Rate: React.FC = () => {
     setOpen(false);
   };
 
-  const handleChange = (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
-    const name = event.target.name as keyof typeof state;
-    setState({
-      ...state,
-      [name]: event.target.value,
-    });
+  const handleCategoryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedCategory(event.target.value as string);
   };
 
   const handleUserChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -95,10 +114,10 @@ const Rate: React.FC = () => {
 
   const submitRating = () => {
     let results;
-    Requests.rate(sessionContext.loginSession, userContext.currentUser.id, selectedUserID, state.category, rating, state.notes).then((r) => {
+    rate(sessionToken, userContext.currentUser.id, selectedUserID, selectedCategoryID, rating, notes).then((r) => {
+      console.log(r);
       results = r.data;
-      console.log(results);
-      if (results.data == null){
+      if (results == null){
         //Show Error Popup
         return null;
       } else {
@@ -106,21 +125,6 @@ const Rate: React.FC = () => {
       }
     })
   }
-
-  useEffect(() => {
-    if (sessionContext.loginSession === '') {
-      history.push('/login');
-    }
-  });
-
-  useEffect(() => {
-    Requests.getAllUsers(sessionContext.loginSession).then((r) => {
-      console.log(r);
-      const results = r.data;
-      setUsers(results.data);
-      console.log(users);
-    });
-  }, [sessionContext.loginSession])
 
   return (
     <section className={classes.ratePage}>
@@ -130,35 +134,37 @@ const Rate: React.FC = () => {
         <Select
           className={classes.selectBox}
           required
-          value={selectedUser}
-          defaultValue=''
+          value={selectedUser ? selectedUser : ''}
+          onChange={handleUserChange}
         >
-          {(users.allUsers && users.allUsers.length > 0) &&
-            users.allUsers.filter(user => user.id !== userContext.currentUser.id).map(user => {
-            return <option key={user.id} onClick={() => {
+          {(users && users.length > 0) &&
+            users.filter(user => user.id !== userContext.currentUser.id).map(user => {
+            return <MenuItem key={user.id} value={user.firstname + " " + user.lastname} onClick={() => {
               setSelectedUser(user.firstname + ' ' + user.lastname)
               setSelectedUserID(user.id);
             }}>
-              {user.firstname} {user.lastname}</option>
+              {user.firstname} {user.lastname}</MenuItem>
           })
           }
         </Select>
-        <FormLabel required className={classes.formLabels}>Category</FormLabel>
-        <Select
-          className={classes.selectBox}
-          native
-          required
-          value={state.category}
-          onChange={handleChange}
-          inputProps={{
-            name: "category",
-            id: 'category',
-          }}
-        >
-          <option value="">Select A Category:</option>
-          <option value={'FRONTEND'}>FRONTEND</option>
-          <option value={"BACKEND"}>BACKEND</option>
-        </Select>
+        <FormControl required>
+          <InputLabel id="category" required className={classes.formLabels}>Category</InputLabel>
+          <Select
+            labelId="category"
+            id="category-selector"
+            value={selectedCategory ? selectedCategory : ''}
+            onChange={handleCategoryChange}
+            className={classes.selectBox}
+          >
+            {(categories && categories.length > 0) &&
+            categories.map(category => {
+              return <MenuItem key={category.id} value={category.id} onClick={() => setSelectedCategoryID(category.id)}>
+                {category.name}
+              </MenuItem>
+              })
+            }
+          </Select>
+        </FormControl>
         <FormLabel required className={classes.formLabels}>Rating</FormLabel>
         <TextField
           className={classes.ratingTextField}
@@ -179,8 +185,8 @@ const Rate: React.FC = () => {
         <textarea
           rows={10}
           cols={40}
-          value={state.notes}
-          onChange={handleChange}
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
         >
         </textarea>
       </form>
