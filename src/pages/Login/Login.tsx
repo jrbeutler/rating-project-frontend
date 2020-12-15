@@ -6,6 +6,11 @@ import { Visibility, VisibilityOff } from '@material-ui/icons';
 import AppPreviewPanel from '../../components/AppPreviewPanel/AppPreviewPanel';
 import { SessionContext, UserContext } from "../../App";
 import { login } from "../../utils/requests/User";
+import clsx from 'clsx';
+import {
+  makeStyles,
+} from '@material-ui/core/styles';
+import './Login.css';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -14,11 +19,59 @@ const Login: React.FC = () => {
   const sessionContext = useContext(SessionContext);
   const history = useHistory();
 
-  useEffect(() => {
-    if (userContext.currentUser.email !== '') {
-      history.push('/');
-    }
-  }, [])
+  const useStyles = makeStyles(theme => ({
+    root: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      '& label': {
+        color: '#85CAB0',
+      },
+
+      '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+          borderColor: '#85CAB0',
+        },
+
+        '&.Mui-focused fieldset': {
+          borderColor: '#85CAB0',
+        },
+      },
+    },
+
+    margin: {
+      margin: theme.spacing(1),
+    },
+    textField: {
+      flexBasis: 200,
+    },
+  }));
+
+
+  const classes = useStyles();
+  const [values, setValues] = React.useState({
+    amount: '',
+    password: '',
+    weight: '',
+    weightRange: '',
+    showPassword: false,
+  });
+  const handleChange = (prop: string) => (event: { target: { value: any; }; }) => {
+    setValues({ ...values, [prop]: event.target.value });
+  };
+
+  const handleClickShowPassword = () => {
+    setValues({ ...values, showPassword: !values.showPassword });
+  };
+
+  const handleMouseDownPassword = (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+  };
+
+  // useEffect(() => {
+  //   if (userContext.currentUser.email !== '') {
+  //     history.push('/');
+  //   }
+  // }, [])
 
   const submitLogin = async () => {
     const response = await login(email, password);
@@ -32,9 +85,9 @@ const Login: React.FC = () => {
     }
   };
 
+
   return (
-    <section>
-      <AppPreviewPanel />
+    <form className={'login-form'}>
       <section>
         <AppPreviewPanel />
         <section>
@@ -102,7 +155,7 @@ const Login: React.FC = () => {
               </Button></div>
         </section>
       </section>
-    </section>
+    </form>
   );
 }
 
