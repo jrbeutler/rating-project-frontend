@@ -12,6 +12,8 @@ import {
   getRatingsCreated,
 } from "../../utils/requests/Rating";
 import { getCurrentUser } from "../../utils/requests/User";
+import {ReactComponent} from "*.svg";
+import {render} from "@testing-library/react";
 
 type CategoryAverages = [{
   name: string;
