@@ -103,29 +103,29 @@ const Account: React.FC = () => {
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
-  // useEffect(() => {
-  //   if (sessionToken) {
-  //     getCurrentUser(sessionToken).then(response => {
-  //       if (response.data) {
-  //         const user = response.data.me;
-  //         userContext.setCurrentUser(user);
-  //         getOverallRatingAverage(sessionToken, user.id).then(response => {
-  //           setOverallRating(response.data.userOverallAverage);
-  //         });
-  //         getCategoryAverages(sessionToken, user.id).then(response => {
-  //           setAverageCategoryRatings(response.data.userRatingCategoryAverages);
-  //         });
-  //         getRatingsCreated(sessionToken, user.id).then(response => {
-  //           setUserCreatedRatings(response.data.userReviewedRatings);
-  //         })
-  //       } else {
-  //         history.push('/login');
-  //       }
-  //     });
-  //   } else {
-  //     history.push('/login');
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (sessionToken) {
+      getCurrentUser(sessionToken).then(response => {
+        if (response.data) {
+          const user = response.data.me;
+          userContext.setCurrentUser(user);
+          getOverallRatingAverage(sessionToken, user.id).then(response => {
+            setOverallRating(response.data.userOverallAverage);
+          });
+          getCategoryAverages(sessionToken, user.id).then(response => {
+            setAverageCategoryRatings(response.data.userRatingCategoryAverages);
+          });
+          getRatingsCreated(sessionToken, user.id).then(response => {
+            setUserCreatedRatings(response.data.userReviewedRatings);
+          })
+        } else {
+          history.push('/login');
+        }
+      });
+    } else {
+      history.push('/login');
+    }
+  }, [])
 
   return (
     <section className={classes.accountPage}>

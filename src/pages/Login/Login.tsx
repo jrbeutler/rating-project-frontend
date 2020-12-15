@@ -67,11 +67,11 @@ const Login: React.FC = () => {
     event.preventDefault();
   };
 
-  // useEffect(() => {
-  //   if (userContext.currentUser.email !== '') {
-  //     history.push('/');
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (userContext.currentUser.email !== '') {
+      history.push('/');
+    }
+  }, [])
 
   const submitLogin = async () => {
     const response = await login(email, password);

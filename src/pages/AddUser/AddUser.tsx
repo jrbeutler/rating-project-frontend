@@ -53,20 +53,20 @@ const AddUser: React.FC = () => {
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
-  // useEffect(() => {
-  //   if (sessionToken) {
-  //     getCurrentUser(sessionToken).then(response => {
-  //       if (response.data) {
-  //         const user = response.data.me;
-  //         userContext.setCurrentUser(user);
-  //       } else {
-  //         history.push('/login');
-  //       }
-  //     });
-  //   } else {
-  //     history.push('/login');
-  //   }
-  // });
+  useEffect(() => {
+    if (sessionToken) {
+      getCurrentUser(sessionToken).then(response => {
+        if (response.data) {
+          const user = response.data.me;
+          userContext.setCurrentUser(user);
+        } else {
+          history.push('/login');
+        }
+      });
+    } else {
+      history.push('/login');
+    }
+  });
 
   const submitUser = () => {
     if (role === '') {

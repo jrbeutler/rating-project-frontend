@@ -77,24 +77,24 @@ const Rate: React.FC = () => {
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
-  // useEffect(() => {
-  //   if (sessionToken) {
-  //     getCurrentUser(sessionToken).then(response => {
-  //       if (response.data) {
-  //         getAllUsers(sessionToken).then(result => {
-  //           setUsers(result.data.allUsers);
-  //         });
-  //         getAllCategories(sessionToken).then(result => {
-  //           setCategories(result.data.getAllCategories);
-  //         })
-  //       } else {
-  //         history.push('/login');
-  //       }
-  //     })
-  //   } else {
-  //     history.push('/login');
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (sessionToken) {
+      getCurrentUser(sessionToken).then(response => {
+        if (response.data) {
+          getAllUsers(sessionToken).then(result => {
+            setUsers(result.data.allUsers);
+          });
+          getAllCategories(sessionToken).then(result => {
+            setCategories(result.data.getAllCategories);
+          })
+        } else {
+          history.push('/login');
+        }
+      })
+    } else {
+      history.push('/login');
+    }
+  }, [])
 
   const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
     if (reason === 'clickaway') {
