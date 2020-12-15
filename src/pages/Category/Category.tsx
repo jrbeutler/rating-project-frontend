@@ -52,26 +52,26 @@ const Category: React.FC = () => {
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
-  useEffect(() => {
-    if (sessionToken) {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          const user = response.data.me;
-          userContext.setCurrentUser(user);
-          getCategoryByID(sessionToken, categoryID).then(response => {
-            setCategoryName(response.data.getCategoryByID.name);
-          });
-          getUserCategoryRatings(sessionToken, user.id, categoryID).then(response => {
-            setUserRatings(response.data.userRatingsByCategory);
-          });
-        } else {
-          history.push('/login');
-        }
-      });
-    } else {
-      history.push('/login');
-    }
-  }, [categoryID]);
+  // useEffect(() => {
+  //   if (sessionToken) {
+  //     getCurrentUser(sessionToken).then(response => {
+  //       if (response.data) {
+  //         const user = response.data.me;
+  //         userContext.setCurrentUser(user);
+  //         getCategoryByID(sessionToken, categoryID).then(response => {
+  //           setCategoryName(response.data.getCategoryByID.name);
+  //         });
+  //         getUserCategoryRatings(sessionToken, user.id, categoryID).then(response => {
+  //           setUserRatings(response.data.userRatingsByCategory);
+  //         });
+  //       } else {
+  //         history.push('/login');
+  //       }
+  //     });
+  //   } else {
+  //     history.push('/login');
+  //   }
+  // }, [categoryID]);
 
   return (
     <div className={classes.categoryPage}>

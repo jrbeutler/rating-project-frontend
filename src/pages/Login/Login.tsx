@@ -15,7 +15,6 @@ import './Login.css';
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   const userContext = useContext(UserContext);
   const sessionContext = useContext(SessionContext);
   const history = useHistory();
@@ -68,11 +67,11 @@ const Login: React.FC = () => {
     event.preventDefault();
   };
 
-  useEffect(() => {
-    if (userContext.currentUser.email !== '') {
-      history.push('/');
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (userContext.currentUser.email !== '') {
+  //     history.push('/');
+  //   }
+  // }, [])
 
   const submitLogin = async () => {
     const response = await login(email, password);
@@ -124,9 +123,9 @@ const Login: React.FC = () => {
                   variant="outlined"
                   type={values.showPassword ? 'text' : 'password'}
                   label="Password"
-                  value={values.password}
+                  value={password}
                   inputProps={{ style: { color: "white" } }}
-                  onChange={handleChange('password')}
+                  onChange={(e) => setPassword(e.target.value)}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -147,7 +146,6 @@ const Login: React.FC = () => {
               </li>
             </ul>
           </form>
-          <div>
             <div className="actions">
               <Button id="loginButton" variant="contained" onClick={e => {
                 e.preventDefault();
@@ -155,7 +153,6 @@ const Login: React.FC = () => {
               }}>
                 Login
               </Button></div>
-          </div>
         </section>
       </section>
     </form>
