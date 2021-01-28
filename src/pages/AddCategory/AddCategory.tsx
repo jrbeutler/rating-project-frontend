@@ -16,20 +16,29 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     addCategoryPage: {
       backgroundColor: '#85CAB0',
-      width: '100%',
+      display: 'flex',
+      flexFlow: 'column wrap',
+      alignContent: 'center',
       height: '100vh',
-      alignItems: 'center',
-      paddingTop: '15rem',
+      padding: '200px',
+    },
+    addCategoryItems:{
+      display: 'flex',
+      flexFlow: 'row wrap',
+      justifyContent: 'space-around',
     },
     addCategoryTextField: {
       width: 200,
+      height: 30,
       opacity: '100%',
       backgroundColor: '#FFFFFF',
+      marginLeft: '10px',
+      marginTop: '8px',
     },
     selectBox: {
       opacity: '100%',
       backgroundColor: '#FFFFFF',
-      color: '#000000'
+      color: '#000000',
     },
     customH1: {
       color: '#000000',
@@ -45,6 +54,9 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: '#FFFFFF',
       fontSize: '1.25rem',
       width: '150px',
+      height: '35px',
+      marginLeft: '10px',
+      marginTop: '8px',
     }
   }),
 );
@@ -99,6 +111,7 @@ const AddCategory: React.FC = () => {
         e.preventDefault();
         handleSubmit();
       }}>
+        <section className={classes.addCategoryItems}>
         <FormLabel required className={classes.formLabels}>Category</FormLabel>
         <TextField
         className={classes.addCategoryTextField}
@@ -107,6 +120,7 @@ const AddCategory: React.FC = () => {
         onChange={e => setCategoryName(e.target.value)}
         />
         <Button type='submit' className={classes.submitButton}>Submit</Button>
+        </section>
       </form>
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="success">

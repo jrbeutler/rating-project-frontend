@@ -18,23 +18,41 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
       height: '100vh',
       paddingTop: '0.5rem',
+      display: 'flex',
+      flexFlow: 'column wrap',
+      alignContent: 'center',
+    },
+    addUserInfo: {
+      display:'flex',
+      flexFlow: 'row wrap',
+      justifyContent: 'center',
+    },
+    addUserItems: {
+      display:'flex',
+      flexFlow: 'row wrap',
+      justifyContent: 'center',
     },
     addUserTextField: {
       width: 150,
       opacity: '100%',
-      backgroundColor: '#FFFFFF'
+      backgroundColor: '#FFFFFF',
+      marginLeft: '10px',
+      marginRight: '40px',
     },
     selectBox: {
       opacity: '100%',
       backgroundColor: '#FFFFFF',
-      color: '#000000'
+      color: '#000000',
     },
     formLabels: {
       opacity: '100%',
-      color: '#FFFFFF'
+      color: '#FFFFFF',
+      marginLeft: '10px',
+      marginRight: '10px',
+
     },
     submitButton:{
-      backgroundColor: '#FFFFFF'
+      backgroundColor: '#FFFFFF',
     }
   }),
 );
@@ -97,6 +115,7 @@ const AddUser: React.FC = () => {
       e.preventDefault();
       submitUser();
     }}>
+      <section className={classes.addUserInfo}>
       <FormLabel required className={classes.formLabels}>Email</FormLabel>
       <TextField
         className={classes.addUserTextField}
@@ -123,6 +142,8 @@ const AddUser: React.FC = () => {
         onChange={e => setLastName(e.target.value)}
       >
       </TextField>
+      </section>
+      <section className={classes.addUserItems}>
       <FormLabel required className={classes.formLabels}>Role</FormLabel>
       <Select
        required
@@ -152,6 +173,7 @@ const AddUser: React.FC = () => {
       >
       </TextField>
       <Button type='submit' className={classes.submitButton}>Submit</Button>
+      </section>
     </form>
     <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
       <Alert onClose={handleClose} severity="success">
