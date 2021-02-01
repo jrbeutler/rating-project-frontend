@@ -150,7 +150,7 @@ const Account: React.FC = () => {
             {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
               averageCategoryRatings.map(categoryAverage => {
                 return <Typography key={categoryAverage.categoryID}>
-                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: </NavLink><Rating name="categoryRating" defaultValue={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/>
+                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: </NavLink><Rating name="categoryRating" defaultValue={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'}/>
                 </Typography>
               })
             }

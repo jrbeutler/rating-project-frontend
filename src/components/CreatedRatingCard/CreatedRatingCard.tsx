@@ -3,6 +3,8 @@ import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { getUserByID } from "../../utils/requests/User";
 import { getCategoryByID } from "../../utils/requests/Category";
+import { RadioButtonChecked } from '@material-ui/icons';
+import { Rating } from '@material-ui/lab';
 
 type RatingProps = {
   createdAt: string,
@@ -57,7 +59,7 @@ const CreatedRatingCard: React.FC<RatingProps> = ({
       <Typography variant='h4'>{reviewedName}</Typography>
       <Typography><strong>Category:</strong> {category}</Typography>
       <Typography>Reviewed: {createdAt}</Typography>
-      <Typography><strong>Rating:</strong> {rating}</Typography>
+      <Typography><strong>Rating:</strong> <Rating name="reviewRating" defaultValue={rating} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size="small" readOnly/></Typography>
       <Typography>{notes}</Typography>
     </li>
   );
