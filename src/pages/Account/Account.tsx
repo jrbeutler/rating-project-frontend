@@ -12,8 +12,8 @@ import {
   getRatingsCreated,
 } from "../../utils/requests/Rating";
 import { getCurrentUser } from "../../utils/requests/User";
-import {ReactComponent} from "*.svg";
-import {render} from "@testing-library/react";
+import { Rating } from '@material-ui/lab';
+import { RadioButtonChecked } from '@material-ui/icons';
 
 type CategoryAverages = [{
   name: string;
@@ -48,7 +48,7 @@ const useStyles = makeStyles(() =>
       paddingTop: '0.5rem',
     },
     profileImage: {
-      width: '20rem',
+      width: '16rem',
       height: 'auto',
     },
     name: {
@@ -136,7 +136,7 @@ const Account: React.FC = () => {
         <article>
           <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
-          <Typography className={classes.rating}>Overall Rating: {overallRating}</Typography>
+          <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" defaultValue={overallRating} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
           <NavLink exact to='/addCategory' className={classes.link}>
             <button>Add Category</button>
           </NavLink>
@@ -150,7 +150,7 @@ const Account: React.FC = () => {
             {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
               averageCategoryRatings.map(categoryAverage => {
                 return <Typography key={categoryAverage.categoryID}>
-                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: {categoryAverage.average}</NavLink>
+                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: </NavLink><Rating name="categoryRating" defaultValue={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/>
                 </Typography>
               })
             }
