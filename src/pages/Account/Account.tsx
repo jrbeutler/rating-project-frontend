@@ -136,7 +136,7 @@ const Account: React.FC = () => {
         <article>
           <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
-          <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" defaultValue={overallRating} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
+          <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.01} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
           <NavLink exact to='/addCategory' className={classes.link}>
             <button>Add Category</button>
           </NavLink>
@@ -150,7 +150,7 @@ const Account: React.FC = () => {
             {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
               averageCategoryRatings.map(categoryAverage => {
                 return <Typography key={categoryAverage.categoryID}>
-                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: </NavLink><Rating name="categoryRating" defaultValue={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'}/>
+                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: </NavLink><Rating name="categoryRating" defaultValue={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'} readOnly/>
                 </Typography>
               })
             }
