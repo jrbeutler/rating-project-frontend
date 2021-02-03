@@ -12,8 +12,8 @@ import {
   getRatingsCreated,
 } from "../../utils/requests/Rating";
 import { getCurrentUser } from "../../utils/requests/User";
-import {ReactComponent} from "*.svg";
-import {render} from "@testing-library/react";
+import { Rating } from '@material-ui/lab';
+import { RadioButtonChecked } from '@material-ui/icons';
 
 type CategoryAverages = [{
   name: string;
@@ -31,7 +31,7 @@ type UserCreatedRatings = [{
     notes: string,
 }];
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     accountPage: {
       backgroundColor: '#85CAB0',
@@ -48,20 +48,36 @@ const useStyles = makeStyles(() =>
       paddingTop: '0.5rem',
     },
     profileImage: {
-      width: '20rem',
-      height: 'auto',
+      [theme.breakpoints.down("sm")]:{
+        width: '10rem',
+        height: 'auto',
+      },
+      [theme.breakpoints.up("md")]:{
+        width: '16rem',
+        height: 'auto',
+      },
     },
     name: {
+      [theme.breakpoints.down("sm")]:{
+        textAlign: 'center',
+      },
+      [theme.breakpoints.up("md")]:{
+        textAlign: 'left',
+      },
       fontSize: '2rem',
       fontWeight: 'normal',
-      textAlign: 'left',
       paddingBottom: '0.5rem',
       borderBottom: 'solid 2px',
     },
     role: {
+      [theme.breakpoints.down("sm")]:{
+        textAlign: 'center',
+      },
+      [theme.breakpoints.up("md")]:{
+        textAlign: 'left',
+      },
       fontSize: '1.5rem',
       fontWeight: 'normal',
-      textAlign: 'left',
       marginTop: '0.5rem',
       marginBottom: '0.5rem',
     },
@@ -136,7 +152,7 @@ const Account: React.FC = () => {
         <article>
           <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
-          <Typography className={classes.rating}>Overall Rating: {overallRating}</Typography>
+          <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.01} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
           <NavLink exact to='/addCategory' className={classes.link}>
             <button>Add Category</button>
           </NavLink>
@@ -150,7 +166,7 @@ const Account: React.FC = () => {
             {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
               averageCategoryRatings.map(categoryAverage => {
                 return <Typography key={categoryAverage.categoryID}>
-                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: {categoryAverage.average}</NavLink>
+                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: </NavLink><Rating name="categoryRating" value={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'} readOnly/>
                 </Typography>
               })
             }

@@ -22,7 +22,12 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: theme.spacing(2),
     },
     logo: {
-      width: '15rem',
+      [theme.breakpoints.down("sm")]:{
+        width: '12rem',
+      },
+      [theme.breakpoints.up("md")]:{
+        width: '15rem',
+      },
       marginBottom: '0.5rem',
     },
     link: {
