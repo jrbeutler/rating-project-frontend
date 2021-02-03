@@ -31,7 +31,7 @@ type UserCreatedRatings = [{
     notes: string,
 }];
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     accountPage: {
       backgroundColor: '#85CAB0',
@@ -48,20 +48,36 @@ const useStyles = makeStyles(() =>
       paddingTop: '0.5rem',
     },
     profileImage: {
-      width: '16rem',
-      height: 'auto',
+      [theme.breakpoints.down("sm")]:{
+        width: '10rem',
+        height: 'auto',
+      },
+      [theme.breakpoints.up("md")]:{
+        width: '16rem',
+        height: 'auto',
+      },
     },
     name: {
+      [theme.breakpoints.down("sm")]:{
+        textAlign: 'center',
+      },
+      [theme.breakpoints.up("md")]:{
+        textAlign: 'left',
+      },
       fontSize: '2rem',
       fontWeight: 'normal',
-      textAlign: 'left',
       paddingBottom: '0.5rem',
       borderBottom: 'solid 2px',
     },
     role: {
+      [theme.breakpoints.down("sm")]:{
+        textAlign: 'center',
+      },
+      [theme.breakpoints.up("md")]:{
+        textAlign: 'left',
+      },
       fontSize: '1.5rem',
       fontWeight: 'normal',
-      textAlign: 'left',
       marginTop: '0.5rem',
       marginBottom: '0.5rem',
     },

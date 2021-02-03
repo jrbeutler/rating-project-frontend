@@ -27,6 +27,14 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: 'auto',
       textAlign: 'left',
       padding: '0.2rem',
+    },
+    reviewerName:{
+      [theme.breakpoints.down("sm")]:{
+        fontSize: "large",
+      },
+      [theme.breakpoints.up("md")]:{
+        fontSize: "x-large",
+      },
     }
   })
 );
@@ -56,7 +64,7 @@ const CreatedRatingCard: React.FC<RatingProps> = ({
 
   return (
     <li className={classes.reviewedCard}>
-      <Typography variant='h4'>{reviewedName}</Typography>
+      <Typography className={classes.reviewerName}>{reviewedName}</Typography>
       <Typography><strong>Category:</strong> {category}</Typography>
       <Typography>Reviewed: {createdAt}</Typography>
       <Typography><strong>Rating:</strong> <Rating name="reviewRating" defaultValue={rating} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size="small" readOnly/></Typography>
