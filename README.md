@@ -39,6 +39,19 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
+## Docker
+
+Docker is software focused on containerized application development and deployment.
+
+### `docker-build`
+
+This command can be found within the `package.json` file. This command builds the Docker container from an image.
+
+### `docker-run`
+
+This command can be found within the `package.json` file. This command runs the built container and binds it to the
+local `3001` port.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
