@@ -49,8 +49,8 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       width: '30%',
       borderRadius: '10px',
-      backgroundColor: '#FFFFFF',
       overflow: 'hidden',
+      backgroundColor: '#FFFFFF',
     },
     selectBox: {
       backgroundColor: '#FFFFFF',
