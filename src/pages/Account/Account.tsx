@@ -4,7 +4,7 @@ import { format, parseISO } from "date-fns";
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
 import { UserContext } from '../../App';
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import {Button, Typography} from "@material-ui/core";
+import { Button, MenuItem, Select, Typography, useMediaQuery } from "@material-ui/core";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
 import {
   getCategoryAverages,
@@ -35,8 +35,9 @@ const useStyles = makeStyles((theme) =>
   createStyles({
     accountPage: {
       backgroundColor: '#85CAB0',
+      paddingTop: '2rem',
       width: '100%',
-      height: '100%',
+      height: '100vh',
     },
     profile: {
       display: 'flex',
@@ -82,7 +83,10 @@ const useStyles = makeStyles((theme) =>
       marginBottom: '0.5rem',
     },
     rating: {
-
+      marginBottom: '1rem',
+    },
+    select: {
+      width: '10rem',
     },
     activeButton: {
       color: '#FFFFFF',
@@ -106,6 +110,9 @@ const useStyles = makeStyles((theme) =>
     },
     reviewedList: {
       listStyleType: 'none',
+      margin: 'auto',
+      width: '90%',
+      padding: '0',
     }
   }),
 );
@@ -117,7 +124,8 @@ const Account: React.FC = () => {
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>();
   const [overallRating, setOverallRating] = useState<number>(0);
   const [averageCategoryRatings, setAverageCategoryRatings] = useState<CategoryAverages>();
-  const [showCreatedReviews, setShowCreatedReviews] = useState<boolean>(false);
+  const [currentTab, setCurrentTab] = useState<string>("Given");
+  const ratingSelectView = useMediaQuery('(max-width: 1050px)');
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
@@ -143,7 +151,11 @@ const Account: React.FC = () => {
     } else {
       history.push('/login');
     }
-  }, [])
+  }, []);
+
+  const handleTabChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setCurrentTab(event.target.value as string);
+  };
 
   return (
     <section className={classes.accountPage}>
@@ -153,15 +165,37 @@ const Account: React.FC = () => {
           <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
           <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.01} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
-          <NavLink exact to='/addCategory' className={classes.link}>
-            <button>Add Category</button>
-          </NavLink>
+          {userContext.currentUser.role === 'ADMIN' &&
+            <NavLink exact to='/addCategory' className={classes.link}>
+              <Button variant='contained'>Add Category</Button>
+            </NavLink>
+          }
         </article>
       </section>
       <section>
-        <Button onClick={() => setShowCreatedReviews(false)} className={!showCreatedReviews ? classes.activeButton : ''}>Rating Categories</Button>
-        <Button onClick={() => setShowCreatedReviews(true)} className={showCreatedReviews ? classes.activeButton : ''}>Ratings Given</Button>
-        {!showCreatedReviews ?
+        {!ratingSelectView ?
+          <React.Fragment>
+            <Button onClick={() => setCurrentTab("Categories")}
+                    className={currentTab === "Categories" ? classes.activeButton : ''}
+                    >Rating Categories
+            </Button>
+            <Button onClick={() => setCurrentTab("Given")}
+                    className={currentTab === "Given" ? classes.activeButton : ''}
+                    >Ratings Given
+            </Button>
+          </React.Fragment> :
+          <Select
+            className={classes.select}
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={currentTab}
+            onChange={handleTabChange}
+          >
+            <MenuItem value={"Categories"}>Rating Categories</MenuItem>
+            <MenuItem value={"Given"}>Ratings Given</MenuItem>
+          </Select>
+        }
+        {currentTab === "Categories" ?
           <section className={classes.categoriesSection}>
             {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
               averageCategoryRatings.map(categoryAverage => {
