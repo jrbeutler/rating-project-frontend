@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../App";
 import { useHistory } from "react-router-dom";
-import { Button, FormControl, FormLabel, InputLabel, MenuItem, Typography } from "@material-ui/core";
+import { Button, FormLabel, MenuItem, Typography } from "@material-ui/core";
 import Select from '@material-ui/core/Select';
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
@@ -135,6 +135,7 @@ const Rate: React.FC = () => {
     } else {
       history.push('/login');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
