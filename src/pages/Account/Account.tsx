@@ -38,6 +38,9 @@ const useStyles = makeStyles((theme) =>
       paddingTop: '2rem',
       width: '100%',
       height: '100vh',
+      '@media only screen and (max-width: 500px)': {
+        height: '600px',
+      },
     },
     profile: {
       display: 'flex',
@@ -87,9 +90,19 @@ const useStyles = makeStyles((theme) =>
     },
     select: {
       width: '10rem',
+      marginBottom: '1rem',
+    },
+    tabArticle: {
+      marginBottom: '1rem',
+    },
+    tabButton: {
+      fontSize: '1rem',
+      textDecoration: 'underline',
     },
     activeButton: {
       color: '#FFFFFF',
+      fontSize: '1rem',
+      textDecoration: 'underline',
     },
     userReviewedSection: {
       display: 'flex',
@@ -99,11 +112,27 @@ const useStyles = makeStyles((theme) =>
       backgroundColor: '#85CAB0',
     },
     categoriesSection: {
-      backgroundColor: '#85CAB0',
+      display: 'flex',
+      flexFlow: 'wrap',
+      '@media only screen and (max-width: 500px)': {
+        flexDirection: 'column',
+        flexFlow: 'no-wrap',
+      },
+      '@media only screen and (max-width: 1050px)': {
+        width: '80%',
+      },
+      width: '70%',
+      margin: 'auto',
+      justifyContent: 'flex-start',
+    },
+    category: {
+      flex: '0 50%',
+      marginBottom: '1rem',
+      textAlign: 'left',
     },
     link: {
       marginRight: '1rem',
-      fontSize: '1rem',
+      fontSize: '1.25rem',
       color: '#000000',
       textDecoration: 'none',
       textAlign: 'right',
@@ -174,16 +203,16 @@ const Account: React.FC = () => {
       </section>
       <section>
         {!ratingSelectView ?
-          <React.Fragment>
+          <article className={classes.tabArticle}>
             <Button onClick={() => setCurrentTab("Categories")}
-                    className={currentTab === "Categories" ? classes.activeButton : ''}
+                    className={currentTab === "Categories" ? classes.activeButton : classes.tabButton}
                     >Rating Categories
             </Button>
             <Button onClick={() => setCurrentTab("Given")}
-                    className={currentTab === "Given" ? classes.activeButton : ''}
+                    className={currentTab === "Given" ? classes.activeButton : classes.tabButton}
                     >Ratings Given
             </Button>
-          </React.Fragment> :
+          </article> :
           <Select
             className={classes.select}
             labelId="demo-simple-select-label"
@@ -199,8 +228,9 @@ const Account: React.FC = () => {
           <section className={classes.categoriesSection}>
             {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
               averageCategoryRatings.map(categoryAverage => {
-                return <Typography key={categoryAverage.categoryID}>
-                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: </NavLink><Rating name="categoryRating" value={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'} readOnly/>
+                return <Typography key={categoryAverage.categoryID} className={classes.category}>
+                  <NavLink exact to={'/category/' + categoryAverage.categoryID} className={classes.link}>{categoryAverage.name}: </NavLink>
+                  <Rating name="categoryRating" value={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'} readOnly/>
                 </Typography>
               })
             }
