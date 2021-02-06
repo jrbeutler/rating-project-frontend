@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import {NavLink, useHistory} from 'react-router-dom';
 import { format, parseISO } from "date-fns";
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
-import { UserContext } from '../../App';
+import { SessionContext, UserContext } from "../../App";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { Button, MenuItem, Select, Typography, useMediaQuery } from "@material-ui/core";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) =>
       width: '100%',
       height: '100vh',
       '@media only screen and (max-width: 500px)': {
-        height: '600px',
+        height: '830px',
       },
     },
     profile: {
@@ -122,7 +122,7 @@ const useStyles = makeStyles((theme) =>
         width: '80%',
       },
       width: '70%',
-      margin: 'auto',
+      margin: 'auto auto auto 25%',
       justifyContent: 'flex-start',
     },
     category: {

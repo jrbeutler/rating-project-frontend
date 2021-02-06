@@ -7,7 +7,7 @@ import { Rating } from '@material-ui/lab';
 
 type RatingProps = {
   createdAt: string,
-  reviewedID: string,
+  reviewedID?: string,
   rating: number,
   notes?: string,
 }
@@ -53,6 +53,9 @@ const CategoryRatingCard: React.FC<RatingProps> = ({
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
+    if (!reviewedID) {
+      return;
+    }
     getUserByID(sessionToken, reviewedID).then((r) => {
       const user = r.data.userByID;
       setReviewedName(user.firstname + ' ' + user.lastname);
@@ -61,8 +64,10 @@ const CategoryRatingCard: React.FC<RatingProps> = ({
 
   return (
     <li className={classes.reviewedCard}>
-      <Typography className={classes.reviewerName}>{reviewedName}</Typography>
-      <Typography>Reviewed: {createdAt}</Typography>
+      {reviewedID ??
+        <Typography className={classes.reviewerName}>{reviewedName}</Typography>
+      }
+      <Typography><strong>Reviewed:</strong> {createdAt}</Typography>
       <Typography><strong>Rating:</strong> <Rating name="reviewRating" defaultValue={rating} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size="small" readOnly/></Typography>
       <Typography>{notes}</Typography>
     </li>

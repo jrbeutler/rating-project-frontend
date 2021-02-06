@@ -92,7 +92,6 @@ const Category: React.FC = () => {
           const formattedDate = format(createdDate, "MM/dd/yyyy");
           return <CategoryRatingCard
             createdAt={formattedDate}
-            reviewedID={userRating.reviewerID}
             rating={userRating.rating}
             notes={userRating.notes}
           />
