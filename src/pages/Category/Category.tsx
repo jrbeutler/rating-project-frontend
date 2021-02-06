@@ -4,9 +4,10 @@ import { getUserCategoryRatings } from "../../utils/requests/Rating";
 import { getCurrentUser } from "../../utils/requests/User";
 import { UserContext } from "../../App";
 import { NavLink } from "react-router-dom";
-import { Typography } from "@material-ui/core";
 import { getCategoryByID } from "../../utils/requests/Category";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { format, parseISO } from 'date-fns';
+import CategoryRatingCard from '../../components/CategoryRatingCard/CategoryRatingCard';
 
 interface ParamTypes {
   categoryID: string
@@ -14,6 +15,7 @@ interface ParamTypes {
 
 type UserRatings = [{
   id: string,
+  createdAt: string,
   categoryID: string,
   reviewedID: string,
   reviewerID: string,
@@ -38,6 +40,12 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: '#FFFFFF',
       marginLeft: '25%',
       marginRight:'25%',
+    },
+    reviewedList: {
+      listStyleType: 'none',
+      margin: 'auto',
+      width: '90%',
+      padding: '0',
     },
   }),
 );
@@ -77,14 +85,20 @@ const Category: React.FC = () => {
     <div className={classes.categoryPage}>
       <h1>{categoryName}</h1>
       <NavLink exact to='/'>&#8592; Back</NavLink>
-      {(userRatings && userRatings.length > 0) &&
+      <ul className={classes.reviewedList}>
+        {(userRatings && userRatings.length > 0) &&
         userRatings.map(userRating => {
-          return <section key={userRating.id} className={classes.userReviewedSection}>
-            <Typography>{userRating.rating}</Typography>
-            <Typography>{userRating.notes}</Typography>
-          </section>
+          const createdDate = parseISO(userRating.createdAt);
+          const formattedDate = format(createdDate, "MM/dd/yyyy");
+          return <CategoryRatingCard
+            createdAt={formattedDate}
+            reviewedID={userRating.reviewerID}
+            rating={userRating.rating}
+            notes={userRating.notes}
+          />
         })
-      }
+        }
+      </ul>
     </div>
   );
 };
