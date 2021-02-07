@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -9,6 +9,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuIcon from '@material-ui/icons/Menu';
 import { NavLink } from 'react-router-dom';
 import logo from '../../assets/EduSource Logo_RGB_clr.png';
+import { UserContext } from "../../App";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,6 +68,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const Header: React.FC = () => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const userContext = useContext(UserContext);
 
   const isMenuOpen = Boolean(anchorEl);
 
@@ -89,9 +91,11 @@ const Header: React.FC = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>
-        <NavLink exact to='/addUser' className={classes.mobileLink} activeClassName={classes.activeLink}>Add User</NavLink>
-      </MenuItem>
+      {userContext.currentUser.role === 'ADMIN' &&
+        <MenuItem onClick={handleMenuClose}>
+          <NavLink exact to='/addUser' className={classes.mobileLink} activeClassName={classes.activeLink}>Add User</NavLink>
+        </MenuItem>
+      }
       <MenuItem onClick={handleMenuClose}>
         <NavLink exact to='/rate' className={classes.mobileLink} activeClassName={classes.activeLink}>Rate</NavLink>
       </MenuItem>
@@ -108,7 +112,9 @@ const Header: React.FC = () => {
           <img src={logo} title='EduSource' alt='EduSource' className={classes.logo} />
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <Typography><NavLink exact to='/addUser' className={classes.link} activeClassName={classes.activeLink}>Add User</NavLink></Typography>
+            {userContext.currentUser.role === 'ADMIN' &&
+              <Typography><NavLink exact to='/addUser' className={classes.link} activeClassName={classes.activeLink}>Add User</NavLink></Typography>
+            }
             <Typography><NavLink exact to='/rate' className={classes.link} activeClassName={classes.activeLink}>Rate</NavLink></Typography>
             <Typography><NavLink exact to='/' className={classes.link} activeClassName={classes.activeLink}>Profile</NavLink></Typography>
           </div>
