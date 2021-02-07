@@ -176,8 +176,8 @@ export async function updateUser(sessionToken: string | null,
       query: `
         mutation {
           updateUser(data: {
-            firstname: ${firstName},
-            lastname: ${lastName}
+            firstname: "${firstName}",
+            lastname: "${lastName}"
           }) {
             firstname,
             lastname

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import {NavLink, useHistory} from 'react-router-dom';
 import { format, parseISO } from "date-fns";
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
-import { SessionContext, UserContext } from "../../App";
+import { UserContext } from "../../App";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { Button, MenuItem, Select, Typography, useMediaQuery } from "@material-ui/core";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
@@ -92,6 +92,9 @@ const useStyles = makeStyles((theme) =>
       width: '10rem',
       marginBottom: '1rem',
     },
+    tabSection: {
+      backgroundColor: '#85CAB0',
+    },
     tabArticle: {
       marginBottom: '1rem',
     },
@@ -142,7 +145,12 @@ const useStyles = makeStyles((theme) =>
       margin: 'auto',
       width: '90%',
       padding: '0',
-    }
+    },
+    editButton: {
+      backgroundColor: '#F7931E',
+      marginTop: '1rem',
+      marginBottom: '2rem'
+    },
   }),
 );
 
@@ -201,7 +209,7 @@ const Account: React.FC = () => {
           }
         </article>
       </section>
-      <section>
+      <section className={classes.tabSection}>
         {!ratingSelectView ?
           <article className={classes.tabArticle}>
             <Button onClick={() => setCurrentTab("Categories")}
@@ -253,6 +261,10 @@ const Account: React.FC = () => {
             </ul>
           </section>
         }
+        <Button onClick={() => history.push('editProfile')}
+                className={classes.editButton}>
+          Edit Profile
+        </Button>
       </section>
     </section>
   );

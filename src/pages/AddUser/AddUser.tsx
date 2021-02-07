@@ -106,7 +106,7 @@ const AddUser: React.FC = () => {
     } else {
       history.push('/login');
     }
-  });
+  }, []);
 
   const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setRole(event.target.value as string);
