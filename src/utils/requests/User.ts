@@ -159,3 +159,32 @@ export async function createUser(sessionToken: string | null,
   });
   return await response.json();
 }
+
+export async function updateUser(sessionToken: string | null,
+                                 firstName: string,
+                                 lastName: string) {
+  if (sessionToken === '') {
+    return null;
+  }
+  const response = await fetch(config.apiURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        mutation {
+          updateUser(data: {
+            firstname: "${firstName}",
+            lastname: "${lastName}"
+          }) {
+            firstname,
+            lastname
+          }
+        }
+        `
+    }),
+  });
+  return await response.json();
+}

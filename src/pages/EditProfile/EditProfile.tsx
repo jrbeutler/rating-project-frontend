@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, FormLabel, MenuItem, Select, TextField, Typography } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { Button, FormLabel, TextField, Typography } from "@material-ui/core";
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { UserContext } from "../../App";
 import { useHistory } from "react-router-dom";
-import { createUser, getCurrentUser } from "../../utils/requests/User";
+import { createUser, getCurrentUser, updateUser } from "../../utils/requests/User";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
 
@@ -11,9 +11,9 @@ function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
-    addUserPage: {
+    editUserPage: {
       backgroundColor: '#85CAB0',
       width: '100%',
       height: '100vh',
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: '2.5rem',
       margin: '1.25rem',
     },
-    addUserSection: {
+    editUserSection: {
       backgroundColor: '#909090',
       '@media only screen and (max-width: 1050px)': {
         width: '90%',
@@ -52,13 +52,6 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: 'hidden',
       backgroundColor: '#FFFFFF',
     },
-    selectBox: {
-      backgroundColor: '#FFFFFF',
-      '@media only screen and (max-width: 1050px)': {
-        width: '100%',
-      },
-      width: '30%',
-    },
     formLabels: {
       color: '#FFFFFF',
       textAlign: 'left',
@@ -79,16 +72,12 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const AddUser: React.FC = () => {
+const EditUser: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
   const userContext = useContext(UserContext);
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [role, setRole] = useState<string>('USER');
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [open, setOpen] = useState<boolean>(false);
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
@@ -108,23 +97,14 @@ const AddUser: React.FC = () => {
     }
   }, []);
 
-  const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setRole(event.target.value as string);
-  };
-
-  const submitUser = () => {
-    if (role === '') {
-      return null;
-    }
-    if (password === confirmPassword) {
-      createUser(sessionToken, firstName, lastName, email, role, password).then(response => {
-        if (response.data) {
-          setOpen(true);
-        } else {
-          //handle error
-        }
-      })
-    }
+  const submitForm = () => {
+    updateUser(sessionToken, firstName, lastName).then(response => {
+      if (response.data) {
+        setOpen(true);
+      } else {
+        console.log(response);
+      }
+    })
   };
 
   const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
@@ -135,21 +115,13 @@ const AddUser: React.FC = () => {
   };
 
   return(
-    <section className={classes.addUserPage}>
-      <Typography variant='h1' className={classes.title}>Add a User</Typography>
-      <section className={classes.addUserSection}>
+    <section className={classes.editUserPage}>
+      <Typography variant='h1' className={classes.title}>Edit Profile</Typography>
+      <section className={classes.editUserSection}>
         <form className={classes.addUserForm} onSubmit={e => {
           e.preventDefault();
-          submitUser();
+          submitForm();
         }}>
-          <FormLabel required className={classes.formLabels}>Email</FormLabel>
-          <TextField
-            className={classes.addUserTextField}
-            id="standard-basic"
-            type="string"
-            required
-            onChange={e => setEmail(e.target.value)}
-          />
           <FormLabel required className={classes.formLabels}>First Name</FormLabel>
           <TextField
             className={classes.addUserTextField}
@@ -168,34 +140,6 @@ const AddUser: React.FC = () => {
             onChange={e => setLastName(e.target.value)}
           >
           </TextField>
-          <FormLabel required className={classes.formLabels}>Role</FormLabel>
-          <Select
-           required
-           className={classes.selectBox}
-           value={role}
-           onChange={handleRoleChange}
-          >
-            <MenuItem value={"USER"}>USER</MenuItem>
-            <MenuItem value={"ADMIN"}>ADMIN</MenuItem>
-          </Select>
-          <FormLabel required className={classes.formLabels}>Password</FormLabel>
-          <TextField
-            className={classes.addUserTextField}
-            id="standard-basic"
-            type="string"
-            required
-            onChange={e => setPassword(e.target.value)}
-          >
-          </TextField>
-          <FormLabel required className={classes.formLabels}>Confirm Password</FormLabel>
-          <TextField
-            className={classes.addUserTextField}
-            id="standard-basic"
-            type="string"
-            required
-            onChange={e => setConfirmPassword(e.target.value)}
-          >
-          </TextField>
           <Button type='submit' className={classes.submitButton}>Submit</Button>
         </form>
       </section>
@@ -207,4 +151,4 @@ const AddUser: React.FC = () => {
     </section>
   );
 };
-export default AddUser;
+export default EditUser;
