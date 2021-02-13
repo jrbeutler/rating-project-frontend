@@ -4,12 +4,13 @@ import { useHistory } from "react-router-dom";
 import { Button, FormLabel, MenuItem, Typography } from "@material-ui/core";
 import Select from '@material-ui/core/Select';
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import { rate } from "../../utils/requests/Rating";
 import { getAllUsers, getCurrentUser } from "../../utils/requests/User";
 import { getAllCategories } from "../../utils/requests/Category";
+import { Rating } from '@material-ui/lab';
+import { RadioButtonChecked } from '@material-ui/icons';
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -168,6 +169,8 @@ const Rate: React.FC = () => {
     })
   }
 
+  const [value, setValue] = React.useState<number | null>(2);
+
   return (
     <section className={classes.ratePage}>
       <Typography variant='h1' className={classes.title}>Rate an Apprentice</Typography>
@@ -210,22 +213,18 @@ const Rate: React.FC = () => {
             }
           </Select>
           <FormLabel required className={classes.formLabels}>Rating</FormLabel>
-          <TextField
-            className={classes.ratingTextField}
-            id="standard-number"
-            type="number"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            InputProps={{
-              inputProps: {
-                max:5, min: 1
+          <Rating
+            name="standard-number"
+            value={value}
+            size='large'
+            icon={<RadioButtonChecked fontSize="inherit"/>}
+            onChange={(event, newValue) => {
+              setValue(newValue);
+              if(newValue != null){
+                setRating(newValue);
               }
             }}
-            value={rating}
-            onChange={(event) => setRating(parseInt(event.target.value))}
-          >
-          </TextField>
+          />
           <FormLabel required className={classes.formLabels}>Comments</FormLabel>
           <textarea
             className={classes.notesField}
