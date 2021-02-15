@@ -169,8 +169,6 @@ const Rate: React.FC = () => {
     })
   }
 
-  const [value, setValue] = React.useState<number | null>(2);
-
   return (
     <section className={classes.ratePage}>
       <Typography variant='h1' className={classes.title}>Rate an Apprentice</Typography>
@@ -215,12 +213,11 @@ const Rate: React.FC = () => {
           <FormLabel required className={classes.formLabels}>Rating</FormLabel>
           <Rating
             name="standard-number"
-            value={value}
+            value={rating}
             size='large'
             icon={<RadioButtonChecked fontSize="inherit"/>}
             onChange={(event, newValue) => {
-              setValue(newValue);
-              if(newValue != null){
+              if(newValue != null && newValue > 0 && newValue < 6){
                 setRating(newValue);
               }
             }}
