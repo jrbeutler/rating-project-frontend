@@ -162,7 +162,9 @@ export async function createUser(sessionToken: string | null,
 
 export async function updateUser(sessionToken: string | null,
                                  firstName: string,
-                                 lastName: string) {
+                                 lastName: string,
+                                 oldPassword: string,
+                                 newPassword: string) {
   if (sessionToken === '') {
     return null;
   }
@@ -177,7 +179,9 @@ export async function updateUser(sessionToken: string | null,
         mutation {
           updateUser(data: {
             firstname: "${firstName}",
-            lastname: "${lastName}"
+            lastname: "${lastName}",
+            oldPassword: "${oldPassword}",
+            newPassword: "${newPassword}"
           }) {
             firstname,
             lastname

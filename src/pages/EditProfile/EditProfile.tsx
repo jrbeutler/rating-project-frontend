@@ -78,6 +78,8 @@ const EditUser: React.FC = () => {
   const userContext = useContext(UserContext);
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
+  const [oldPassword, setOldPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
@@ -98,7 +100,7 @@ const EditUser: React.FC = () => {
   }, []);
 
   const submitForm = () => {
-    updateUser(sessionToken, firstName, lastName).then(response => {
+    updateUser(sessionToken, firstName, lastName, oldPassword, newPassword).then(response => {
       if (response.data) {
         setOpen(true);
       } else {
@@ -138,6 +140,24 @@ const EditUser: React.FC = () => {
             type="string"
             required
             onChange={e => setLastName(e.target.value)}
+          >
+          </TextField>
+          <FormLabel required className={classes.formLabels}>Old Password</FormLabel>
+          <TextField
+            className={classes.addUserTextField}
+            id="standard-basic"
+            type="string"
+            required
+            onChange={e => setOldPassword(e.target.value)}
+          >
+          </TextField>
+          <FormLabel required className={classes.formLabels}>New Password</FormLabel>
+          <TextField
+            className={classes.addUserTextField}
+            id="standard-basic"
+            type="string"
+            required
+            onChange={e => setNewPassword(e.target.value)}
           >
           </TextField>
           <Button type='submit' className={classes.submitButton}>Submit</Button>
