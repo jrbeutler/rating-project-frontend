@@ -14,9 +14,9 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: '#FFFFFF',
       borderRadius: '1rem',
       '@media only screen and (max-width: 1050px)': {
-        width: '80%',
+        width: '70%',
       },
-      width: '50%',
+      width: '20%',
       justifySelf: 'center',
       marginTop: '1rem',
       marginBottom: '1rem',
