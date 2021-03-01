@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { getUserByID } from "../../utils/requests/User";
-import { RadioButtonChecked } from '@material-ui/icons';
-import { Rating } from '@material-ui/lab';
 
 type RatingProps = {
   apprenticeID?: string,
-  rating: number,
   role: string,
 }
 
@@ -41,7 +38,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const ApprenticeCard: React.FC<RatingProps> = ({
   apprenticeID,
-  rating,
   role
 }) => {
   const classes = useStyles();
@@ -62,7 +58,6 @@ const ApprenticeCard: React.FC<RatingProps> = ({
     <li className={classes.reviewedCard}>
       <Typography className={classes.apprenticeName}>{apprenticeName}</Typography>
       <Typography><strong>Role:</strong> {role}</Typography>
-      <Typography><strong>Overall Rating:</strong> <Rating name="overallRating" defaultValue={rating} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size="small" readOnly/></Typography>
     </li>
   );
 }

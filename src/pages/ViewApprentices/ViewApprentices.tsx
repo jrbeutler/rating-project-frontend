@@ -4,14 +4,14 @@ import { getAllApprentices, getCurrentUser } from '../../utils/requests/User';
 import { NavLink } from "react-router-dom";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import ApprenticeCard from '../../components/ApprenticeCard/ApprenticeCard';
-import { getOverallRatingAverage } from '../../utils/requests/Rating';
 
 
 type Apprentices = [{
   id: string,
-  rating: number,
+  rating?: number,
   role: string,
 }];
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,7 +42,6 @@ const useStyles = makeStyles((theme: Theme) =>
 const ViewApprentices: React.FC = () => {
   const classes = useStyles();
   const [apprentices, setApprentices] = useState<Apprentices>();
-  const [overallRating, setOverallRating] = useState<number>(0);
   const history = useHistory();
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
@@ -71,12 +70,8 @@ const ViewApprentices: React.FC = () => {
       <ul className={classes.apprenticeList}>
         {(apprentices && apprentices.length > 0) &&
         apprentices.map(apprentice => {
-          getOverallRatingAverage(sessionToken, apprentice.id).then(response => {
-            setOverallRating(response.data.userOverallAverage);
-          });
           return <ApprenticeCard
             apprenticeID={apprentice.id}
-            rating={overallRating}
             role={apprentice.role}
           />
         })
