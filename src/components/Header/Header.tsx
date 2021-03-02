@@ -96,6 +96,11 @@ const Header: React.FC = () => {
           <NavLink exact to='/addUser' className={classes.mobileLink} activeClassName={classes.activeLink}>Add User</NavLink>
         </MenuItem>
       }
+      {userContext.currentUser.role === 'ADMIN' &&
+      <MenuItem onClick={handleMenuClose}>
+        <NavLink exact to='/viewApprentices' className={classes.mobileLink} activeClassName={classes.activeLink}>View Apprentices</NavLink>
+      </MenuItem>
+      }
       <MenuItem onClick={handleMenuClose}>
         <NavLink exact to='/rate' className={classes.mobileLink} activeClassName={classes.activeLink}>Rate</NavLink>
       </MenuItem>
@@ -114,6 +119,9 @@ const Header: React.FC = () => {
           <div className={classes.sectionDesktop}>
             {userContext.currentUser.role === 'ADMIN' &&
               <Typography><NavLink exact to='/addUser' className={classes.link} activeClassName={classes.activeLink}>Add User</NavLink></Typography>
+            }
+            {userContext.currentUser.role === 'ADMIN' &&
+            <Typography><NavLink exact to='/viewApprentices' className={classes.link} activeClassName={classes.activeLink}>View Apprentices</NavLink></Typography>
             }
             <Typography><NavLink exact to='/rate' className={classes.link} activeClassName={classes.activeLink}>Rate</NavLink></Typography>
             <Typography><NavLink exact to='/' className={classes.link} activeClassName={classes.activeLink}>Profile</NavLink></Typography>
