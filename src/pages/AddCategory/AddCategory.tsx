@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, FormLabel, Select, TextField } from '@material-ui/core';
+import { Button, FormLabel, TextField, Typography } from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { getCurrentUser } from "../../utils/requests/User";
 import { UserContext } from "../../App";
@@ -16,47 +16,60 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     addCategoryPage: {
       backgroundColor: '#85CAB0',
-      display: 'flex',
-      flexFlow: 'column wrap',
-      alignContent: 'center',
+      width: '100%',
       height: '100vh',
-      padding: '200px',
+      '@media only screen and (max-width: 320px)': {
+        height: '700px',
+      },
+      paddingTop: '0.5rem',
     },
-    addCategoryItems:{
+    title: {
+      fontSize: '2.5rem',
+      margin: '1.25rem',
+    },
+    addCategorySection: {
+      backgroundColor: '#909090',
+      '@media only screen and (max-width: 1050px)': {
+        width: '90%',
+      },
+      width: '50%',
+      margin: 'auto',
+      borderRadius: '20px',
+    },
+    categoryForm: {
+      width: '80%',
+      padding: '2rem',
+      margin: 'auto',
       display: 'flex',
-      flexFlow: 'row wrap',
-      justifyContent: 'space-around',
+      alignItems: 'center',
+      flexDirection: 'column',
     },
     addCategoryTextField: {
-      width: 200,
-      height: 30,
-      opacity: '100%',
+      '@media only screen and (max-width: 1050px)': {
+        width: '90%',
+      },
+      width: '30%',
       backgroundColor: '#FFFFFF',
-      marginLeft: '10px',
-      marginTop: '8px',
-    },
-    selectBox: {
-      opacity: '100%',
-      backgroundColor: '#FFFFFF',
-      color: '#000000',
-    },
-    customH1: {
-      color: '#000000',
-      opacity: '100%',
-      fontSize: '3rem',
+      margin: '1rem 0 0.5rem 0',
+      borderRadius: '10px',
+      overflow: 'hidden',
     },
     formLabels: {
-      opacity: '100%',
       color: '#FFFFFF',
-      fontSize: '2rem',
+      textAlign: 'left',
+      '@media only screen and (max-width: 1050px)': {
+        width: '100%',
+      },
+      width: '30%',
+      margin: '1rem 0 0.5rem 0'
     },
     submitButton:{
-      backgroundColor: '#FFFFFF',
-      fontSize: '1.25rem',
-      width: '150px',
-      height: '35px',
-      marginLeft: '10px',
-      marginTop: '8px',
+      '@media only screen and (max-width: 1050px)': {
+        width: '80%',
+      },
+      width: '30%',
+      backgroundColor: '#F7931E',
+      marginBottom: '1rem',
     }
   }),
 );
@@ -106,22 +119,22 @@ const AddCategory: React.FC = () => {
 
   return(
     <section className={classes.addCategoryPage}>
-      <h1 className={classes.customH1}>Add a Category</h1>
-      <form onSubmit={e => {
-        e.preventDefault();
-        handleSubmit();
-      }}>
-        <section className={classes.addCategoryItems}>
-        <FormLabel required className={classes.formLabels}>Category</FormLabel>
-        <TextField
-        className={classes.addCategoryTextField}
-        id="standard-basic"
-        type="string"
-        onChange={e => setCategoryName(e.target.value)}
-        />
-        <Button type='submit' className={classes.submitButton}>Submit</Button>
-        </section>
-      </form>
+      <Typography variant='h1' className={classes.title}>Add a Category</Typography>
+      <section className={classes.addCategorySection}>
+        <form className={classes.categoryForm} onSubmit={e => {
+          e.preventDefault();
+          handleSubmit();
+        }}>
+          <FormLabel required className={classes.formLabels}>Category</FormLabel>
+          <TextField
+          className={classes.addCategoryTextField}
+          id="standard-basic"
+          type="string"
+          onChange={e => setCategoryName(e.target.value)}
+          />
+          <Button type='submit' className={classes.submitButton}>Submit</Button>
+        </form>
+      </section>
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="success">
           Successful!

@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import {NavLink, useHistory} from 'react-router-dom';
 import { format, parseISO } from "date-fns";
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
-import { UserContext } from '../../App';
+import { UserContext } from "../../App";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import {Button, Typography} from "@material-ui/core";
+import { Button, MenuItem, Select, Typography, useMediaQuery } from "@material-ui/core";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
 import {
   getCategoryAverages,
@@ -12,8 +12,8 @@ import {
   getRatingsCreated,
 } from "../../utils/requests/Rating";
 import { getCurrentUser } from "../../utils/requests/User";
-import {ReactComponent} from "*.svg";
-import {render} from "@testing-library/react";
+import { Rating } from '@material-ui/lab';
+import { RadioButtonChecked } from '@material-ui/icons';
 
 type CategoryAverages = [{
   name: string;
@@ -31,12 +31,16 @@ type UserCreatedRatings = [{
     notes: string,
 }];
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     accountPage: {
       backgroundColor: '#85CAB0',
+      paddingTop: '2rem',
       width: '100%',
-      height: '100%',
+      height: '100vh',
+      '@media only screen and (max-width: 500px)': {
+        height: '830px',
+      },
     },
     profile: {
       display: 'flex',
@@ -48,28 +52,60 @@ const useStyles = makeStyles(() =>
       paddingTop: '0.5rem',
     },
     profileImage: {
-      width: '20rem',
-      height: 'auto',
+      [theme.breakpoints.down("sm")]:{
+        width: '10rem',
+        height: 'auto',
+      },
+      [theme.breakpoints.up("md")]:{
+        width: '16rem',
+        height: 'auto',
+      },
     },
     name: {
+      [theme.breakpoints.down("sm")]:{
+        textAlign: 'center',
+      },
+      [theme.breakpoints.up("md")]:{
+        textAlign: 'left',
+      },
       fontSize: '2rem',
       fontWeight: 'normal',
-      textAlign: 'left',
       paddingBottom: '0.5rem',
       borderBottom: 'solid 2px',
     },
     role: {
+      [theme.breakpoints.down("sm")]:{
+        textAlign: 'center',
+      },
+      [theme.breakpoints.up("md")]:{
+        textAlign: 'left',
+      },
       fontSize: '1.5rem',
       fontWeight: 'normal',
-      textAlign: 'left',
       marginTop: '0.5rem',
       marginBottom: '0.5rem',
     },
     rating: {
-
+      marginBottom: '1rem',
+    },
+    select: {
+      width: '10rem',
+      marginBottom: '1rem',
+    },
+    tabSection: {
+      backgroundColor: '#85CAB0',
+    },
+    tabArticle: {
+      marginBottom: '1rem',
+    },
+    tabButton: {
+      fontSize: '1rem',
+      textDecoration: 'underline',
     },
     activeButton: {
       color: '#FFFFFF',
+      fontSize: '1rem',
+      textDecoration: 'underline',
     },
     userReviewedSection: {
       display: 'flex',
@@ -79,18 +115,42 @@ const useStyles = makeStyles(() =>
       backgroundColor: '#85CAB0',
     },
     categoriesSection: {
-      backgroundColor: '#85CAB0',
+      display: 'flex',
+      flexFlow: 'wrap',
+      '@media only screen and (max-width: 500px)': {
+        flexDirection: 'column',
+        flexFlow: 'no-wrap',
+      },
+      '@media only screen and (max-width: 1050px)': {
+        width: '80%',
+      },
+      width: '70%',
+      margin: 'auto auto auto 25%',
+      justifyContent: 'flex-start',
+    },
+    category: {
+      flex: '0 50%',
+      marginBottom: '1rem',
+      textAlign: 'left',
     },
     link: {
       marginRight: '1rem',
-      fontSize: '1rem',
+      fontSize: '1.25rem',
       color: '#000000',
       textDecoration: 'none',
       textAlign: 'right',
     },
     reviewedList: {
       listStyleType: 'none',
-    }
+      margin: 'auto',
+      width: '90%',
+      padding: '0',
+    },
+    editButton: {
+      backgroundColor: '#F7931E',
+      marginTop: '1rem',
+      marginBottom: '2rem'
+    },
   }),
 );
 
@@ -101,7 +161,8 @@ const Account: React.FC = () => {
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>();
   const [overallRating, setOverallRating] = useState<number>(0);
   const [averageCategoryRatings, setAverageCategoryRatings] = useState<CategoryAverages>();
-  const [showCreatedReviews, setShowCreatedReviews] = useState<boolean>(false);
+  const [currentTab, setCurrentTab] = useState<string>("Given");
+  const ratingSelectView = useMediaQuery('(max-width: 1050px)');
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
@@ -127,7 +188,11 @@ const Account: React.FC = () => {
     } else {
       history.push('/login');
     }
-  }, [])
+  }, []);
+
+  const handleTabChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setCurrentTab(event.target.value as string);
+  };
 
   return (
     <section className={classes.accountPage}>
@@ -136,21 +201,44 @@ const Account: React.FC = () => {
         <article>
           <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
-          <Typography className={classes.rating}>Overall Rating: {overallRating}</Typography>
-          <NavLink exact to='/addCategory' className={classes.link}>
-            <button>Add Category</button>
-          </NavLink>
+          <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.01} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
+          {userContext.currentUser.role === 'ADMIN' &&
+            <NavLink exact to='/addCategory' className={classes.link}>
+              <Button variant='contained'>Add Category</Button>
+            </NavLink>
+          }
         </article>
       </section>
-      <section>
-        <Button onClick={() => setShowCreatedReviews(false)} className={!showCreatedReviews ? classes.activeButton : ''}>Rating Categories</Button>
-        <Button onClick={() => setShowCreatedReviews(true)} className={showCreatedReviews ? classes.activeButton : ''}>Ratings Given</Button>
-        {!showCreatedReviews ?
+      <section className={classes.tabSection}>
+        {!ratingSelectView ?
+          <article className={classes.tabArticle}>
+            <Button onClick={() => setCurrentTab("Categories")}
+                    className={currentTab === "Categories" ? classes.activeButton : classes.tabButton}
+                    >Rating Categories
+            </Button>
+            <Button onClick={() => setCurrentTab("Given")}
+                    className={currentTab === "Given" ? classes.activeButton : classes.tabButton}
+                    >Ratings Given
+            </Button>
+          </article> :
+          <Select
+            className={classes.select}
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={currentTab}
+            onChange={handleTabChange}
+          >
+            <MenuItem value={"Categories"}>Rating Categories</MenuItem>
+            <MenuItem value={"Given"}>Ratings Given</MenuItem>
+          </Select>
+        }
+        {currentTab === "Categories" ?
           <section className={classes.categoriesSection}>
             {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
               averageCategoryRatings.map(categoryAverage => {
-                return <Typography key={categoryAverage.categoryID}>
-                  <NavLink exact to={'/category/' + categoryAverage.categoryID}>{categoryAverage.name}: {categoryAverage.average}</NavLink>
+                return <Typography key={categoryAverage.categoryID} className={classes.category}>
+                  <NavLink exact to={'/category/' + categoryAverage.categoryID} className={classes.link}>{categoryAverage.name}: </NavLink>
+                  <Rating name="categoryRating" value={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'} readOnly/>
                 </Typography>
               })
             }
@@ -173,6 +261,10 @@ const Account: React.FC = () => {
             </ul>
           </section>
         }
+        <Button onClick={() => history.push('editProfile')}
+                className={classes.editButton}>
+          Edit Profile
+        </Button>
       </section>
     </section>
   );
