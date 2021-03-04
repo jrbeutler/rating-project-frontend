@@ -17,17 +17,13 @@ const useStyles = makeStyles((theme: Theme) =>
     reviewedCard: {
       backgroundColor: '#FFFFFF',
       borderRadius: '1rem',
-      '@media only screen and (max-width: 1050px)': {
-        width: '80%',
-      },
-      width: '50%',
+      boxShadow: '0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.20)',
+      flex: '1 1 30%',
       justifySelf: 'center',
-      marginTop: '1rem',
-      marginBottom: '1rem',
-      marginLeft: 'auto',
-      marginRight: 'auto',
+      margin: '4rem',
       textAlign: 'left',
-      padding: '0.2rem',
+      padding: '1rem',
+      maxWidth: '20rem',
     },
     reviewerName:{
       [theme.breakpoints.down("sm")]:{

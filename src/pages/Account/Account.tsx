@@ -145,9 +145,12 @@ const useStyles = makeStyles((theme) =>
       textAlign: 'right',
     },
     reviewedList: {
+      display: 'flex',
+      flexWrap: 'wrap',
       listStyleType: 'none',
       margin: 'auto',
       width: '90%',
+      maxWidth: '60rem',
       padding: '0',
     },
     editButton: {
@@ -202,6 +205,7 @@ const Account: React.FC = () => {
             setOverallRating(response.data.userOverallAverage);
           });
           getCategoryAverages(sessionToken, user.id).then(response => {
+            console.log(response);
             setAverageCategoryRatings(response.data.userRatingCategoryAverages);
           });
           getRatingsCreated(sessionToken, user.id).then(response => {
