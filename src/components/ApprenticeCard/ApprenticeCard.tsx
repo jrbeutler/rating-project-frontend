@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { getUserByID } from "../../utils/requests/User";
+import { NavLink } from "react-router-dom";
 
 type RatingProps = {
   apprenticeID?: string,
@@ -56,7 +57,7 @@ const ApprenticeCard: React.FC<RatingProps> = ({
 
   return (
     <li className={classes.reviewedCard}>
-      <Typography className={classes.apprenticeName}>{apprenticeName}</Typography>
+     <NavLink exact to={'/apprentice/' + apprenticeID}><Typography className={classes.apprenticeName}>{apprenticeName}</Typography></NavLink>
       <Typography><strong>Role:</strong> {role}</Typography>
     </li>
   );

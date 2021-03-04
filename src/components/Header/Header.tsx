@@ -124,7 +124,7 @@ const Header: React.FC = () => {
             <Typography><NavLink exact to='/viewApprentices' className={classes.link} activeClassName={classes.activeLink}>View Apprentices</NavLink></Typography>
             }
             <Typography><NavLink exact to='/rate' className={classes.link} activeClassName={classes.activeLink}>Rate</NavLink></Typography>
-            <Typography><NavLink exact to='/' className={classes.link} activeClassName={classes.activeLink}>Profile</NavLink></Typography>
+            <Typography><a href='/' className={classes.link}>Profile</a></Typography>
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
