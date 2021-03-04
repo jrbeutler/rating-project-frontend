@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {NavLink, useHistory, useParams} from 'react-router-dom';
+import {NavLink, useHistory, useParams, useLocation} from 'react-router-dom';
 import { format, parseISO } from "date-fns";
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
 import { UserContext } from "../../App";
@@ -162,6 +162,7 @@ const Account: React.FC = () => {
   const classes = useStyles();
   const userContext = useContext(UserContext);
   const history = useHistory();
+  let location = useLocation();
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>();
   const [overallRating, setOverallRating] = useState<number>(0);
   const [averageCategoryRatings, setAverageCategoryRatings] = useState<CategoryAverages>();
@@ -286,10 +287,10 @@ const Account: React.FC = () => {
             </ul>
           </section>
         }
-        <Button onClick={() => history.push('editProfile')}
+        {location.pathname === '/' && <Button onClick={() => history.push('editProfile')}
                 className={classes.editButton}>
           Edit Profile
-        </Button>
+        </Button>}
       </section>
     </section>
   );
