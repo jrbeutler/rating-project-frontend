@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { getAllApprentices, getCurrentUser } from '../../utils/requests/User';
-import { NavLink } from "react-router-dom";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import ApprenticeCard from '../../components/ApprenticeCard/ApprenticeCard';
+import { Typography } from '@material-ui/core';
 
 
 type Apprentices = [{
@@ -23,13 +23,15 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     apprenticeList: {
       display: 'flex',
-      flexDirection: 'row',
       flexWrap: 'wrap',
-      justifyContent: 'center',
       listStyleType: 'none',
       margin: 'auto',
       width: '90%',
+      maxWidth: '60rem',
       padding: '0',
+    },
+    apprenticesTitle: {
+      margin: '2rem',
     },
   }),
 );
@@ -59,20 +61,21 @@ const ViewApprentices: React.FC = () => {
   }, [])
 
   return (
-    <div className={classes.apprenticePage}>
-      <h1>Apprentices</h1>
-      <NavLink exact to='/'>&#8592; Back</NavLink>
-      <ul className={classes.apprenticeList}>
-        {(apprentices && apprentices.length > 0) &&
-        apprentices.map(apprentice => {
-          return <ApprenticeCard
-            apprenticeID={apprentice.id}
-            role={apprentice.role}
-          />
-        })
-        }
-      </ul>
-    </div>
+    <section className={classes.apprenticePage}>
+      <Typography variant={"h4"} className={classes.apprenticesTitle}>Apprentices</Typography>
+      <section>
+        <ul className={classes.apprenticeList}>
+          {(apprentices && apprentices.length > 0) &&
+          apprentices.map(apprentice => {
+            return <ApprenticeCard
+              apprenticeID={apprentice.id}
+              role={apprentice.role}
+            />
+          })
+          }
+        </ul>
+      </section>
+    </section>
   );
 };
 
