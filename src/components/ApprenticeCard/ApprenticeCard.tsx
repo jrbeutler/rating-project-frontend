@@ -2,14 +2,11 @@ import React, { useEffect, useState } from "react";
 import { createStyles, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { getUserByID } from "../../utils/requests/User";
-import { RadioButtonChecked } from '@material-ui/icons';
-import { Rating } from '@material-ui/lab';
+import { NavLink } from "react-router-dom";
 
 type RatingProps = {
-  createdAt: string,
-  reviewedID?: string,
-  rating: number,
-  notes?: string,
+  apprenticeID?: string,
+  role: string,
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -25,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: '1rem',
       maxWidth: '20rem',
     },
-    reviewerName:{
+    apprenticeName:{
       [theme.breakpoints.down("sm")]:{
         fontSize: "large",
       },
@@ -36,38 +33,30 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const CategoryRatingCard: React.FC<RatingProps> = ({
-  createdAt,
-  reviewedID,
-  rating,
-  notes =''
+const ApprenticeCard: React.FC<RatingProps> = ({
+  apprenticeID,
+  role
 }) => {
   const classes = useStyles();
-
-  const [reviewedName, setReviewedName] = useState<string>('');
-
+  const [apprenticeName, setApprenticeName] = useState<string>('');
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
-    if (!reviewedID) {
+    if (!apprenticeID) {
       return;
     }
-    getUserByID(sessionToken, reviewedID).then((r) => {
+    getUserByID(sessionToken, apprenticeID).then((r) => {
       const user = r.data.userByID;
-      setReviewedName(user.firstname + ' ' + user.lastname);
+      setApprenticeName(user.firstname + ' ' + user.lastname);
     });
   }, []);
 
   return (
     <li className={classes.reviewedCard}>
-      {reviewedID ??
-        <Typography className={classes.reviewerName}>{reviewedName}</Typography>
-      }
-      <Typography><strong>Reviewed:</strong> {createdAt}</Typography>
-      <Typography><strong>Rating:</strong> <Rating name="reviewRating" defaultValue={rating} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size="small" readOnly/></Typography>
-      <Typography>{notes}</Typography>
+     <NavLink exact to={'/apprentice/' + apprenticeID}><Typography className={classes.apprenticeName}>{apprenticeName}</Typography></NavLink>
+      <Typography><strong>Role:</strong> {role}</Typography>
     </li>
   );
 }
 
-export default CategoryRatingCard;
+export default ApprenticeCard;

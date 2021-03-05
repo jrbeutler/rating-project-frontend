@@ -124,6 +124,32 @@ export async function getAllUsers(sessionToken: string | null) {
   return await response.json();
 }
 
+export async function getAllApprentices(sessionToken: string | null) {
+  if (sessionToken === '') {
+    return null;
+  }
+  const response = await fetch(config.apiURL,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        query{
+          allApprentices {
+            id
+            firstname
+            lastname
+            role
+          }
+        }
+        `
+    }),
+  });
+  return await response.json();
+}
+
 export async function createUser(sessionToken: string | null,
                                  firstName: string,
                                  lastName: string,
@@ -162,7 +188,9 @@ export async function createUser(sessionToken: string | null,
 
 export async function updateUser(sessionToken: string | null,
                                  firstName: string,
-                                 lastName: string) {
+                                 lastName: string,
+                                 oldPassword: string,
+                                 newPassword: string) {
   if (sessionToken === '') {
     return null;
   }
@@ -177,7 +205,9 @@ export async function updateUser(sessionToken: string | null,
         mutation {
           updateUser(data: {
             firstname: "${firstName}",
-            lastname: "${lastName}"
+            lastname: "${lastName}",
+            oldPassword: "${oldPassword}",
+            newPassword: "${newPassword}"
           }) {
             firstname,
             lastname

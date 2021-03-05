@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {NavLink, useHistory} from 'react-router-dom';
+import {NavLink, useHistory, useParams, useLocation} from 'react-router-dom';
 import { format, parseISO } from "date-fns";
 import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
 import { UserContext } from "../../App";
@@ -11,9 +11,13 @@ import {
   getOverallRatingAverage,
   getRatingsCreated,
 } from "../../utils/requests/Rating";
-import { getCurrentUser } from "../../utils/requests/User";
+import {getCurrentUser, getUserByID} from "../../utils/requests/User";
 import { Rating } from '@material-ui/lab';
 import { RadioButtonChecked } from '@material-ui/icons';
+
+interface ParamTypes {
+  apprenticeID: string
+}
 
 type CategoryAverages = [{
   name: string;
@@ -141,9 +145,12 @@ const useStyles = makeStyles((theme) =>
       textAlign: 'right',
     },
     reviewedList: {
+      display: 'flex',
+      flexWrap: 'wrap',
       listStyleType: 'none',
       margin: 'auto',
       width: '90%',
+      maxWidth: '60rem',
       padding: '0',
     },
     editButton: {
@@ -158,16 +165,38 @@ const Account: React.FC = () => {
   const classes = useStyles();
   const userContext = useContext(UserContext);
   const history = useHistory();
+  let location = useLocation();
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>();
   const [overallRating, setOverallRating] = useState<number>(0);
   const [averageCategoryRatings, setAverageCategoryRatings] = useState<CategoryAverages>();
   const [currentTab, setCurrentTab] = useState<string>("Given");
   const ratingSelectView = useMediaQuery('(max-width: 1050px)');
+  let { apprenticeID } = useParams<ParamTypes>();
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
     if (sessionToken) {
+      if (apprenticeID != null){
+        getUserByID(sessionToken, apprenticeID).then(response => {
+          if (response.data) {
+            const apprentice = response.data.userByID;
+            userContext.setCurrentUser(apprentice);
+            getOverallRatingAverage(sessionToken, apprentice.id).then(response => {
+              setOverallRating(response.data.userOverallAverage);
+            });
+            getCategoryAverages(sessionToken, apprentice.id).then(response => {
+              setAverageCategoryRatings(response.data.userRatingCategoryAverages);
+            });
+            getRatingsCreated(sessionToken, apprentice.id).then(response => {
+              setUserCreatedRatings(response.data.userReviewedRatings);
+            })
+          } else {
+            history.push('/login');
+          }
+        });
+      }
+      else {
       getCurrentUser(sessionToken).then(response => {
         if (response.data) {
           const user = response.data.me;
@@ -176,6 +205,7 @@ const Account: React.FC = () => {
             setOverallRating(response.data.userOverallAverage);
           });
           getCategoryAverages(sessionToken, user.id).then(response => {
+            console.log(response);
             setAverageCategoryRatings(response.data.userRatingCategoryAverages);
           });
           getRatingsCreated(sessionToken, user.id).then(response => {
@@ -185,7 +215,7 @@ const Account: React.FC = () => {
           history.push('/login');
         }
       });
-    } else {
+    }} else {
       history.push('/login');
     }
   }, []);
@@ -261,10 +291,10 @@ const Account: React.FC = () => {
             </ul>
           </section>
         }
-        <Button onClick={() => history.push('editProfile')}
+        {location.pathname === '/' && <Button onClick={() => history.push('editProfile')}
                 className={classes.editButton}>
           Edit Profile
-        </Button>
+        </Button>}
       </section>
     </section>
   );

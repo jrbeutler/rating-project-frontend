@@ -6,12 +6,16 @@ import { UserContext } from "../../App";
 import { NavLink } from "react-router-dom";
 import { getCategoryByID } from "../../utils/requests/Category";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, toDate } from "date-fns";
 import CategoryRatingCard from '../../components/CategoryRatingCard/CategoryRatingCard';
+import Chart from "react-google-charts";
+import { Typography } from "@material-ui/core";
 
 interface ParamTypes {
   categoryID: string
 }
+
+
 
 type UserRatings = [{
   id: string,
@@ -32,6 +36,9 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '100vh',
       paddingTop: '0.5rem',
     },
+    categoryName: {
+      margin: '2rem',
+    },
     userReviewedSection: {
       display: 'flex',
       flexDirection: 'column',
@@ -41,10 +48,25 @@ const useStyles = makeStyles((theme: Theme) =>
       marginLeft: '25%',
       marginRight:'25%',
     },
+    chartSection: {
+      display: 'flex',
+      justifyContent: 'center',
+      width: '100%',
+    },
+    chart: {
+      boxShadow: '0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.20)',
+      marginLeft: '8.5rem',
+      '@media only screen and (max-width: 500px)': {
+        marginLeft: '20px',
+      },
+    },
     reviewedList: {
+      display: 'flex',
+      flexWrap: 'wrap',
       listStyleType: 'none',
       margin: 'auto',
       width: '90%',
+      maxWidth: '60rem',
       padding: '0',
     },
   }),
@@ -54,6 +76,8 @@ const Category: React.FC = () => {
   const classes = useStyles();
   const [userRatings, setUserRatings] = useState<UserRatings>();
   const [categoryName, setCategoryName] = useState<string>('');
+  const [chartPoints, setChartPoints] = useState<Array<Array<any>>>([['Time', 'Rating']]);
+
   let { categoryID } = useParams<ParamTypes>();
   const userContext = useContext(UserContext);
   const history = useHistory();
@@ -81,23 +105,55 @@ const Category: React.FC = () => {
     }
   }, [categoryID]);
 
+  useEffect(() => {
+    userRatings?.map(rating => {
+      const createdDate = parseISO(rating.createdAt);
+      const formattedDate = toDate(createdDate);
+      let newChartPoints = chartPoints;
+      newChartPoints.push([formattedDate, rating.rating]);
+      // @ts-ignore
+      setChartPoints(newChartPoints);
+      console.log(chartPoints);
+    });
+  }, [userRatings])
+
   return (
     <div className={classes.categoryPage}>
-      <h1>{categoryName}</h1>
-      <NavLink exact to='/'>&#8592; Back</NavLink>
-      <ul className={classes.reviewedList}>
-        {(userRatings && userRatings.length > 0) &&
-        userRatings.map(userRating => {
-          const createdDate = parseISO(userRating.createdAt);
-          const formattedDate = format(createdDate, "MM/dd/yyyy");
-          return <CategoryRatingCard
-            createdAt={formattedDate}
-            rating={userRating.rating}
-            notes={userRating.notes}
+      <Typography variant={"h4"} className={classes.categoryName}>{categoryName}</Typography>
+      {(userRatings && userRatings.length > 0) &&
+      <React.Fragment>
+        <section className={classes.chartSection}>
+          <Chart
+            className={classes.chart}
+            width={"75%"}
+            height={"80%"}
+            chartType="ScatterChart"
+            loader={<div>Loading Chart</div>}
+            data={chartPoints}
+            options={{
+              title: categoryName + ' Ratings Over Time',
+              hAxis: { title: 'Time' },
+              vAxis: { title: 'Rating' },
+              legend: 'none',
+              trendlines: { 0: {} },
+            }}
+            rootProps={{ 'data-testid': '1' }}
           />
-        })
-        }
-      </ul>
+        </section>
+        <ul className={classes.reviewedList}>
+          {userRatings.map(userRating => {
+            const createdDate = parseISO(userRating.createdAt);
+            const formattedDate = format(createdDate, "MM/dd/yyyy");
+            return <CategoryRatingCard
+              createdAt={formattedDate}
+              rating={userRating.rating}
+              notes={userRating.notes}
+            />
+          })
+          }
+        </ul>
+      </React.Fragment>
+      }
     </div>
   );
 };

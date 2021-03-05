@@ -10,6 +10,7 @@ import AddUser from './pages/AddUser/AddUser';
 import AddCategory from "./pages/AddCategory/AddCategory";
 import Category from "./pages/Category/Category";
 import EditProfile from "./pages/EditProfile/EditProfile";
+import ViewApprentices from './pages/ViewApprentices/ViewApprentices';
 
 type User = {
   id: string;
@@ -67,8 +68,10 @@ const App: React.FC = () => {
               <Route exact path={'/addUser'} component={AddUser} />
               <Route exact path={'/addCategory'} component={AddCategory} />
               <Route exact path={'/editProfile'} component={EditProfile} />
+              <Route exact path={'/viewApprentices'} component={ViewApprentices} />
               <Route exact path={'/'} component={Account} />
               <Route exact path={'/category/:categoryID'} component={Category} />
+              <Route exact path={'/apprentice/:apprenticeID'} component={Account} />
               <Redirect from={'*'} to={'/404'} />
             </Switch>
           </Router>
