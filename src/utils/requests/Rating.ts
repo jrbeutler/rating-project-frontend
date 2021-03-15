@@ -179,3 +179,30 @@ export async function getRatingsCreated(sessionToken: string | null, userID: str
   });
   return await response.json();
 }
+
+export async function getUserAllRatings(sessionToken: string | null, userID: string) {
+  if (sessionToken === '') {
+    return null;
+  }
+  const response = await fetch(config.apiURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        query {
+          userAllRatings(reviewedID: "${userID}") {
+            id,
+            createdAt,
+            reviewedID,
+            reviewerID,
+            rating,
+          }
+        }
+        `
+    }),
+  });
+  return await response.json();
+}

@@ -3,7 +3,6 @@ import { useHistory, useParams } from "react-router-dom";
 import { getUserCategoryRatings } from "../../utils/requests/Rating";
 import { getCurrentUser } from "../../utils/requests/User";
 import { UserContext } from "../../App";
-import { NavLink } from "react-router-dom";
 import { getCategoryByID } from "../../utils/requests/Category";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { format, parseISO, toDate } from "date-fns";
