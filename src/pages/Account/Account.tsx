@@ -169,7 +169,6 @@ const Account: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>("Given");
   const ratingSelectView = useMediaQuery('(max-width: 1050px)');
   let { apprenticeID } = useParams<ParamTypes>();
-
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
@@ -261,12 +260,17 @@ const Account: React.FC = () => {
         {currentTab === "Categories" ?
           <section className={classes.categoriesSection}>
             {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
-              averageCategoryRatings.map(categoryAverage => {
-                return <Typography key={categoryAverage.categoryID} className={classes.category}>
-                  <NavLink exact to={'/category/' + categoryAverage.categoryID} className={classes.link}>{categoryAverage.name}: </NavLink>
-                  <Rating name="categoryRating" value={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'} readOnly/>
-                </Typography>
-              })
+            averageCategoryRatings.map(categoryAverage => {
+              return <Typography key={categoryAverage.categoryID} className={classes.category}>
+                {location.pathname === "/" && <NavLink exact to={'/category/' + categoryAverage.categoryID}
+                         className={classes.link}>{categoryAverage.name}: </NavLink> }
+                {location.pathname === ("/apprentice/" + apprenticeID) && <NavLink exact to={'/apprentice/' + apprenticeID + '/category/' + categoryAverage.categoryID}
+                                                       className={classes.link}>{categoryAverage.name}: </NavLink> }
+                <Rating name="categoryRating" value={categoryAverage.average} precision={0.1}
+                        icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'} readOnly/>
+              </Typography>
+
+            })
             }
           </section> :
           <section className={classes.userReviewedSection}>

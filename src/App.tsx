@@ -72,6 +72,7 @@ const App: React.FC = () => {
               <Route exact path={'/'} component={Account} />
               <Route exact path={'/category/:categoryID'} component={Category} />
               <Route exact path={'/apprentice/:apprenticeID'} component={Account} />
+              <Route exact path={'/apprentice/:apprenticeID/category/:categoryID'} component={Category} />
               <Redirect from={'*'} to={'/404'} />
             </Switch>
           </Router>

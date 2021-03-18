@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
 import { getUserCategoryRatings } from "../../utils/requests/Rating";
-import { getCurrentUser } from "../../utils/requests/User";
+import { getCurrentUser, getUserByID } from "../../utils/requests/User";
 import { UserContext } from "../../App";
 import { NavLink } from "react-router-dom";
 import { getCategoryByID } from "../../utils/requests/Category";
@@ -11,6 +11,7 @@ import CategoryRatingCard from '../../components/CategoryRatingCard/CategoryRati
 
 interface ParamTypes {
   categoryID: string
+  apprenticeID: string
 }
 
 type UserRatings = [{
@@ -54,28 +55,49 @@ const Category: React.FC = () => {
   const classes = useStyles();
   const [userRatings, setUserRatings] = useState<UserRatings>();
   const [categoryName, setCategoryName] = useState<string>('');
+  let location = useLocation();
   let { categoryID } = useParams<ParamTypes>();
+  let { apprenticeID } = useParams<ParamTypes>();
   const userContext = useContext(UserContext);
   const history = useHistory();
+  let apprenticePage = '/apprentice/' + apprenticeID;
 
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
     if (sessionToken) {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          const user = response.data.me;
-          userContext.setCurrentUser(user);
-          getCategoryByID(sessionToken, categoryID).then(response => {
-            setCategoryName(response.data.getCategoryByID.name);
-          });
-          getUserCategoryRatings(sessionToken, user.id, categoryID).then(response => {
-            setUserRatings(response.data.userRatingsByCategory);
-          });
-        } else {
-          history.push('/login');
-        }
-      });
+      if (apprenticeID != null){
+        getUserByID(sessionToken, apprenticeID).then(response => {
+          if (response.data) {
+            const apprentice = response.data.userByID;
+            userContext.setCurrentUser(apprentice);
+            getCategoryByID(sessionToken, categoryID).then(response => {
+              setCategoryName(response.data.getCategoryByID.name);
+            });
+            getUserCategoryRatings(sessionToken, apprentice.id, categoryID).then(response => {
+              setUserRatings(response.data.userRatingsByCategory);
+            });
+          } else {
+            history.push('/login');
+          }
+        });
+      }
+      else{
+        getCurrentUser(sessionToken).then(response => {
+          if (response.data) {
+            const user = response.data.me;
+            userContext.setCurrentUser(user);
+            getCategoryByID(sessionToken, categoryID).then(response => {
+              setCategoryName(response.data.getCategoryByID.name);
+            });
+            getUserCategoryRatings(sessionToken, user.id, categoryID).then(response => {
+              setUserRatings(response.data.userRatingsByCategory);
+            });
+          } else {
+            history.push('/login');
+          }
+        });
+      }
     } else {
       history.push('/login');
     }
@@ -84,7 +106,8 @@ const Category: React.FC = () => {
   return (
     <div className={classes.categoryPage}>
       <h1>{categoryName}</h1>
-      <NavLink exact to='/'>&#8592; Back</NavLink>
+      {location.pathname === '/category/' + categoryID && <NavLink exact to='/'>&#8592; Back</NavLink> }
+      {location.pathname === '/apprentice/' + apprenticeID + '/category/' + categoryID && <NavLink exact to={(apprenticePage)}>&#8592; Back</NavLink> }
       <ul className={classes.reviewedList}>
         {(userRatings && userRatings.length > 0) &&
         userRatings.map(userRating => {
