@@ -54,6 +54,10 @@ const useStyles = makeStyles((theme) =>
       justifyContent: 'space-evenly',
       alignItems: 'center',
       paddingTop: '0.5rem',
+      '@media only screen and (max-width: 1080px)': {
+        paddingLeft: '1rem',
+      },
+      paddingLeft: '20rem',
     },
     name: {
       [theme.breakpoints.down("sm")]:{
