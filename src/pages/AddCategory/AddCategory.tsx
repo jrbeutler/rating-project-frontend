@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, FormLabel, TextField, Typography } from "@material-ui/core";
+import {Button, FormLabel, MenuItem, Select, TextField, Typography, useMediaQuery} from "@material-ui/core";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { getCurrentUser } from "../../utils/requests/User";
 import { UserContext } from "../../App";
@@ -54,6 +54,26 @@ const useStyles = makeStyles((theme: Theme) =>
       borderRadius: '10px',
       overflow: 'hidden',
     },
+    tabSection: {
+      backgroundColor: '#85CAB0',
+    },
+    select: {
+      width: '10rem',
+      marginBottom: '1rem',
+    },
+    tabArticle: {
+      marginBottom: '1rem',
+    },
+    tabButton: {
+      color: "#FFFFFF",
+      fontSize: '1rem',
+      textDecoration: 'underline',
+    },
+    activeButton: {
+      color: '#000000',
+      fontSize: '1rem',
+      textDecoration: 'underline',
+    },
     formLabels: {
       color: '#FFFFFF',
       textAlign: 'left',
@@ -79,8 +99,9 @@ const AddCategory: React.FC = () => {
   const history = useHistory();
   const userContext = useContext(UserContext);
   const [categoryName, setCategoryName] = useState<string>();
+  const [currentTab, setCurrentTab] = useState<string>("Categories")
   const [open, setOpen] = useState(false);
-
+  const categorySelectView = useMediaQuery('(max-width: 1050px)');
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
@@ -117,29 +138,64 @@ const AddCategory: React.FC = () => {
     }
   };
 
+  const handleTabChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setCurrentTab(event.target.value as string);
+  };
+
   return(
     <section className={classes.addCategoryPage}>
-      <Typography variant='h1' className={classes.title}>Add a Category</Typography>
-      <section className={classes.addCategorySection}>
-        <form className={classes.categoryForm} onSubmit={e => {
-          e.preventDefault();
-          handleSubmit();
-        }}>
-          <FormLabel required className={classes.formLabels}>Category</FormLabel>
-          <TextField
-          className={classes.addCategoryTextField}
-          id="standard-basic"
-          type="string"
-          onChange={e => setCategoryName(e.target.value)}
-          />
-          <Button type='submit' className={classes.submitButton}>Submit</Button>
-        </form>
-      </section>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success">
+      <section className={classes.tabSection}>
+        {!categorySelectView ?
+          <article className={classes.tabArticle}>
+            <Button onClick={() => setCurrentTab("Categories")}
+                    className={currentTab === "Categories" ? classes.activeButton : classes.tabButton}
+            >Categories
+            </Button>
+            <Button onClick={() => setCurrentTab("Given")}
+                    className={currentTab === "Given" ? classes.activeButton : classes.tabButton}
+            >Users
+            </Button>
+          </article> :
+          <Select
+            className={classes.select}
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={currentTab}
+            onChange={handleTabChange}
+          >
+            <MenuItem value={"Categories"}>Categories</MenuItem>
+            <MenuItem value={"Given"}>Users</MenuItem>
+          </Select>
+        }
+        {currentTab === "Categories" ?
+          <section className={classes.addCategoryPage}>
+          <Typography variant='h1' className={classes.title}>Add a Category</Typography>
+          <section className={classes.addCategorySection}>
+            <form className={classes.categoryForm} onSubmit={e => {
+              e.preventDefault();
+              handleSubmit();
+            }}>
+              <FormLabel required className={classes.formLabels}>Category</FormLabel>
+              <TextField
+                className={classes.addCategoryTextField}
+                id="standard-basic"
+                type="string"
+                onChange={e => setCategoryName(e.target.value)}
+              />
+              <Button type='submit' className={classes.submitButton}>Submit</Button>
+            </form>
+          </section>
+          <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="success">
           Successful!
-        </Alert>
-      </Snackbar>
+          </Alert>
+          </Snackbar>
+          </section> :
+          <section className={classes.addCategoryPage}>
+
+          </section>
+        }
+      </section>
     </section>
   );
 };
