@@ -86,7 +86,7 @@ const AddUser: React.FC = () => {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [role, setRole] = useState<string>('USER');
+  const [role, setRole] = useState<string>('APPRENTICE');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [open, setOpen] = useState<boolean>(false);
@@ -175,7 +175,8 @@ const AddUser: React.FC = () => {
            value={role}
            onChange={handleRoleChange}
           >
-            <MenuItem value={"USER"}>USER</MenuItem>
+            <MenuItem value={"APPRENTICE"}>APPRENTICE</MenuItem>
+            <MenuItem value={"FTE"}>Full-Time Employee</MenuItem>
             <MenuItem value={"ADMIN"}>ADMIN</MenuItem>
           </Select>
           <FormLabel required className={classes.formLabels}>Password</FormLabel>
