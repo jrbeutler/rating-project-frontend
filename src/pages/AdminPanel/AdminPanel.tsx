@@ -1,11 +1,22 @@
-import React from "react";
-import { Typography } from "@material-ui/core";
+import React, { useState } from "react";
+import { Button, Typography } from "@material-ui/core";
 
 const AdminPanel: React.FC = () => {
+  const [currentTab, setCurrentTab] = useState("Categories");
+
   return (
-    <section>
-      <Typography variant={"h1"}>Admin Panel</Typography>
-    </section>
+    <main>
+      <Typography variant={"h1"}>Manage Rating Service</Typography>
+      <section>
+        <Button onClick={() => setCurrentTab("Categories")}>
+          Categories
+        </Button>
+        <Button onClick={() => setCurrentTab("Users")}>
+          Users
+        </Button>
+        <Typography>{currentTab}</Typography>
+      </section>
+    </main>
   );
 };
 
