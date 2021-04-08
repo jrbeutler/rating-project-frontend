@@ -1,32 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button, FormLabel, TextField, Typography } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { getCurrentUser } from "../../utils/requests/User";
-import { UserContext } from "../../App";
-import { useHistory } from "react-router-dom";
-import { createCategory } from "../../utils/requests/Category";
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
+import { createCategory } from "../../utils/requests/Category";
 
-function Alert(props: AlertProps) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+type AddCategoryProps = {
+  sessionToken: string,
+};
 
-const useStyles = makeStyles((theme: Theme) =>
+const Alert = (props: AlertProps) => {
+  return <MuiAlert elevation={6} variant={"filled"} {...props} />;
+};
+
+const useStyles = makeStyles(() =>
   createStyles({
-    addCategoryPage: {
-      backgroundColor: '#85CAB0',
-      width: '100%',
-      height: '100vh',
-      '@media only screen and (max-width: 320px)': {
-        height: '700px',
-      },
-      paddingTop: '0.5rem',
-    },
-    title: {
-      fontSize: '2.5rem',
-      margin: '1.25rem',
-    },
     addCategorySection: {
       backgroundColor: '#909090',
       '@media only screen and (max-width: 1050px)': {
@@ -35,6 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '50%',
       margin: 'auto',
       borderRadius: '20px',
+      boxShadow: '0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.20)',
     },
     categoryForm: {
       width: '80%',
@@ -74,52 +63,35 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const AddCategory: React.FC = () => {
+const AddCategory: React.FC<AddCategoryProps> = ({sessionToken}) => {
   const classes = useStyles();
-  const history = useHistory();
-  const userContext = useContext(UserContext);
-  const [categoryName, setCategoryName] = useState<string>();
-  const [open, setOpen] = useState(false);
-
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
-
-  useEffect(() => {
-    if (sessionToken) {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          const user = response.data.me;
-          userContext.setCurrentUser(user);
-        } else {
-          history.push('/login');
-        }
-      })
-    } else {
-      history.push('/login');
-    }
-  });
-
-  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpen(false);
-  };
+  const [categoryName, setCategoryName] = useState<string>("");
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [alertType, setAlertType] = useState("successful");
 
   const handleSubmit = () => {
     if (categoryName) {
       createCategory(sessionToken, categoryName).then(response => {
         if (response.data) {
-          setOpen(true);
+          setAlertOpen(true);
+          setAlertType("successful");
         } else {
-          //handle error
+          setAlertOpen(true);
+          setAlertType("failed");
         }
       })
     }
   };
 
-  return(
-    <section className={classes.addCategoryPage}>
-      <Typography variant='h1' className={classes.title}>Add a Category</Typography>
+  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setAlertOpen(false);
+  };
+
+  return (
+    <>
       <section className={classes.addCategorySection}>
         <form className={classes.categoryForm} onSubmit={e => {
           e.preventDefault();
@@ -127,20 +99,28 @@ const AddCategory: React.FC = () => {
         }}>
           <FormLabel required className={classes.formLabels}>Category</FormLabel>
           <TextField
-          className={classes.addCategoryTextField}
-          id="standard-basic"
-          type="string"
-          onChange={e => setCategoryName(e.target.value)}
+            className={classes.addCategoryTextField}
+            id="standard-basic"
+            type="string"
+            value={categoryName}
+            onChange={e => setCategoryName(e.target.value)}
           />
           <Button type='submit' className={classes.submitButton}>Submit</Button>
         </form>
       </section>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success">
-          Successful!
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
+        {alertType === "successful" ?
+        <Alert onClose={handleClose} severity={"success"}>
+          Added Category!
+        </Alert> :
+        <Alert onClose={handleClose} severity={"error"}>
+          Something went wrong, please try again!
         </Alert>
+        }
+
       </Snackbar>
-    </section>
+    </>
   );
 };
+
 export default AddCategory;

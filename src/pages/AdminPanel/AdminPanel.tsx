@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, Typography } from "@material-ui/core";
+import AddCategory from "../../components/AddCategory/AddCategory";
+import { SessionContext } from "../../App";
 
 const AdminPanel: React.FC = () => {
   const [currentTab, setCurrentTab] = useState("Categories");
+  const sessionContext = useContext(SessionContext);
 
   return (
     <main>
@@ -14,7 +17,14 @@ const AdminPanel: React.FC = () => {
         <Button onClick={() => setCurrentTab("Users")}>
           Users
         </Button>
-        <Typography>{currentTab}</Typography>
+      </section>
+      <section>
+        {currentTab === "Categories" &&
+          <AddCategory sessionToken={sessionContext.sessionToken} />
+        }
+        {currentTab === "Users" &&
+          <p>users</p>
+        }
       </section>
     </main>
   );
