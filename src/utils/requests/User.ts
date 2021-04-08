@@ -98,15 +98,11 @@ export async function getCurrentUser(sessionToken: string) {
   return await response.json();
 }
 
-export async function getAllUsers(sessionToken: string | null) {
-  if (sessionToken === '') {
-    return null;
-  }
+export async function getAllUsers() {
   const response = await fetch(config.apiURL,{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
@@ -211,6 +207,33 @@ export async function updateUser(sessionToken: string | null,
           }) {
             firstname,
             lastname
+          }
+        }
+        `
+    }),
+  });
+  return await response.json();
+}
+
+export async function updateUserPosition(sessionToken: string, userID: string, position: string) {
+  const response = await fetch(config.apiURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        mutation {
+          changeUserPosition(
+            userID: "${userID}",
+            position: "${position}"
+          ) {
+            id,
+            email,
+            firstname,
+            lastname,
+            role
           }
         }
         `

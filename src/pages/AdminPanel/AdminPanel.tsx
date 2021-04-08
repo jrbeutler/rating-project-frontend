@@ -1,12 +1,14 @@
 import React, { useContext, useState } from "react";
 import { Button, Typography } from "@material-ui/core";
 import AddCategory from "../../components/AddCategory/AddCategory";
-import { SessionContext } from "../../App";
+import { SessionContext, UserContext } from "../../App";
 import AddUser from "../../components/AddUser/AddUser";
+import EditUser from "../../components/EditUser/EditUser";
 
 const AdminPanel: React.FC = () => {
   const [currentTab, setCurrentTab] = useState("Categories");
   const sessionContext = useContext(SessionContext);
+  const userContext = useContext(UserContext);
 
   return (
     <main>
@@ -15,16 +17,21 @@ const AdminPanel: React.FC = () => {
         <Button onClick={() => setCurrentTab("Categories")}>
           Categories
         </Button>
-        <Button onClick={() => setCurrentTab("Users")}>
-          Users
-        </Button>
+        {userContext.currentUser.role === "ADMIN" &&
+          <Button onClick={() => setCurrentTab("Users")}>
+            Users
+          </Button>
+        }
       </section>
       <section>
         {currentTab === "Categories" &&
           <AddCategory sessionToken={sessionContext.sessionToken} />
         }
         {currentTab === "Users" &&
-          <AddUser sessionToken={sessionContext.sessionToken} />
+          <>
+            <EditUser sessionToken={sessionContext.sessionToken} />
+            <AddUser sessionToken={sessionContext.sessionToken} />
+          </>
         }
       </section>
     </main>
