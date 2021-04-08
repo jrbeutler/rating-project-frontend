@@ -65,7 +65,8 @@ export async function getUserByID(sessionToken: string | null, userID: string) {
             firstname,
             lastname,
             email,
-            role
+            role,
+            isActive
           }
         }
         `
@@ -90,6 +91,7 @@ export async function getCurrentUser(sessionToken: string) {
             firstname,
             lastname,
             role
+            isActive
           }
         }
         `
@@ -112,6 +114,7 @@ export async function getAllUsers() {
             email
             firstname
             lastname
+            isActive
           }
         }
         `
@@ -138,6 +141,7 @@ export async function getAllApprentices(sessionToken: string | null) {
             firstname
             lastname
             role
+            isActive
           }
         }
         `
@@ -174,6 +178,7 @@ export async function createUser(sessionToken: string | null,
             firstname
             lastname
             email
+            isActive
           }
         }
         `
@@ -206,7 +211,8 @@ export async function updateUser(sessionToken: string | null,
             newPassword: "${newPassword}"
           }) {
             firstname,
-            lastname
+            lastname,
+            isActive
           }
         }
         `
@@ -233,11 +239,61 @@ export async function updateUserPosition(sessionToken: string, userID: string, p
             email,
             firstname,
             lastname,
-            role
+            role,
+            isActive
           }
         }
         `
     }),
+  });
+  return await response.json();
+}
+
+export async function archiveUser(sessionToken: string, userID: string) {
+  const response = await fetch(config.apiURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        mutation {
+          archiveUser(userID: "${userID}") {
+            id
+            email
+            firstname
+            lastname
+            role
+            isActive
+          }
+        }
+      `
+    })
+  });
+  return await response.json();
+}
+
+export async function activateUser(sessionToken: string, userID: string) {
+  const response = await fetch(config.apiURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        mutation {
+          activateUser(userID: "${userID}") {
+            id
+            email
+            firstname
+            lastname
+            isActive
+          }
+        }
+      `
+    })
   });
   return await response.json();
 }

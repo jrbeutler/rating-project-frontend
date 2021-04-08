@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, createStyles, FormLabel, MenuItem, Select } from "@material-ui/core";
-import { getAllUsers, updateUserPosition } from "../../utils/requests/User";
+import { activateUser, archiveUser, getAllUsers, updateUserPosition } from "../../utils/requests/User";
 import { makeStyles } from "@material-ui/core/styles";
 import Snackbar from "@material-ui/core/Snackbar";
 import { Alert } from "@material-ui/lab";
@@ -13,7 +13,9 @@ type User = {
   id: string,
   email: string,
   firstname: string,
-  lastname: string
+  lastname: string,
+  role: string,
+  isActive: string,
 };
 
 const useStyles = makeStyles(() =>
@@ -67,6 +69,8 @@ const EditUser: React.FC<EditUserProps> = ({sessionToken}) => {
   const classes = useStyles();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>('Select a User');
+  const [selectedActiveUser, setSelectedActiveUser] = useState<string>('');
+  const [selectedArchivedUser, setSelectedArchivedUser] = useState<string>('');
   const [role, setRole] = useState<string>('APPRENTICE');
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
   const [alertType, setAlertType] = useState("successful");
@@ -105,6 +109,38 @@ const EditUser: React.FC<EditUserProps> = ({sessionToken}) => {
     })
   };
 
+  const handleActiveUserSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedActiveUser(event.target.value as string);
+  }
+
+  const handleArchivedUserSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedArchivedUser(event.target.value as string);
+  }
+
+  const submitArchiveUser = () => {
+    archiveUser(sessionToken, selectedActiveUser).then(response => {
+      if (response.data) {
+        setAlertOpen(true);
+        setAlertType("successful");
+      } else {
+        setAlertOpen(true);
+        setAlertType("failed");
+      }
+    });
+  };
+
+  const submitActivateUser = () => {
+    activateUser(sessionToken, selectedArchivedUser).then(response => {
+      if (response.data) {
+        setAlertOpen(true);
+        setAlertType("successful");
+      } else {
+        setAlertOpen(true);
+        setAlertType("failed");
+      }
+    });
+  };
+
   return (
     <>
       <section className={classes.editUserSection}>
@@ -138,10 +174,50 @@ const EditUser: React.FC<EditUserProps> = ({sessionToken}) => {
           <Button type='submit' className={classes.submitButton}>Submit</Button>
         </form>
       </section>
+      <section className={classes.editUserSection}>
+        <form className={classes.editUserForm} onSubmit={e => {
+          e.preventDefault()
+          submitArchiveUser();
+        }}>
+          <FormLabel className={classes.formLabels} required>user</FormLabel>
+          <Select
+            className={classes.selectBox}
+            required
+            value={selectedActiveUser}
+            onChange={handleActiveUserSelect}
+          >
+            {users.map(user => {
+              return user.isActive && <MenuItem key={user.id} value={user.id}>{user.firstname}</MenuItem>
+            })
+            }
+          </Select>
+          <Button className={classes.submitButton} type='submit'>Archive user</Button>
+        </form>
+      </section>
+      <section className={classes.editUserSection}>
+        <form className={classes.editUserForm} onSubmit={e => {
+          e.preventDefault();
+          submitActivateUser();
+        }}>
+          <FormLabel className={classes.formLabels} required>user</FormLabel>
+          <Select
+            className={classes.selectBox}
+            required
+            value={selectedArchivedUser}
+            onChange={handleArchivedUserSelect}
+          >
+            {users.map(user => {
+              return !user.isActive && <MenuItem key={user.id} value={user.id}>{user.firstname}</MenuItem>
+            })
+            }
+          </Select>
+          <Button className={classes.submitButton} type='submit'>Activate user</Button>
+        </form>
+      </section>
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
         {alertType === "successful" ?
           <Alert onClose={handleClose} severity={"success"}>
-            Changed User Position!
+            Updated Users!
           </Alert> :
           <Alert onClose={handleClose} severity={"error"}>
             Something went wrong, please try again!

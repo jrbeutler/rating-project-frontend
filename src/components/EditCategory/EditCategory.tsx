@@ -123,6 +123,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({sessionToken}) => {
     <>
       <section className={classes.editCategorySection}>
         <form className={classes.editCategoryForm} onSubmit={e => {
+          e.preventDefault();
           submitArchiveCategory();
         }}>
           <FormLabel className={classes.formLabels} required>Category</FormLabel>
