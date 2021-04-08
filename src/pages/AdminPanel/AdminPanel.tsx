@@ -4,6 +4,7 @@ import AddCategory from "../../components/AddCategory/AddCategory";
 import { SessionContext, UserContext } from "../../App";
 import AddUser from "../../components/AddUser/AddUser";
 import EditUser from "../../components/EditUser/EditUser";
+import EditCategory from "../../components/EditCategory/EditCategory";
 
 const AdminPanel: React.FC = () => {
   const [currentTab, setCurrentTab] = useState("Categories");
@@ -25,7 +26,10 @@ const AdminPanel: React.FC = () => {
       </section>
       <section>
         {currentTab === "Categories" &&
-          <AddCategory sessionToken={sessionContext.sessionToken} />
+          <>
+            <EditCategory sessionToken={sessionContext.sessionToken} />
+            <AddCategory sessionToken={sessionContext.sessionToken} />
+          </>
         }
         {currentTab === "Users" &&
           <>

@@ -126,7 +126,7 @@ const Rate: React.FC = () => {
           getAllUsers().then(result => {
             setUsers(result.data.allUsers);
           });
-          getAllCategories(sessionToken).then(result => {
+          getAllCategories().then(result => {
             setCategories(result.data.getAllCategories);
           })
         } else {
