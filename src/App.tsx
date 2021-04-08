@@ -6,7 +6,6 @@ import Account from './pages/Account/Account';
 import Login from './pages/Login/Login';
 import Rate from './pages/Rate/Rate';
 import { getCurrentUser } from "./utils/requests/User";
-import AddUser from './pages/AddUser/AddUser';
 import AdminPanel from "./pages/AdminPanel/AdminPanel";
 import Category from "./pages/Category/Category";
 import EditProfile from "./pages/EditProfile/EditProfile";
@@ -65,7 +64,6 @@ const App: React.FC = () => {
             <Switch>
               <Route exact path={'/login'} component={Login} />
               <Route exact path={'/rate'} component={Rate} />
-              <Route exact path={'/addUser'} component={AddUser} />
               <Route exact path={'/manage'} component={AdminPanel} />
               <Route exact path={'/editProfile'} component={EditProfile} />
               <Route exact path={'/viewApprentices'} component={ViewApprentices} />

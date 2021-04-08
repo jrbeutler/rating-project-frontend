@@ -117,7 +117,6 @@ const AddCategory: React.FC<AddCategoryProps> = ({sessionToken}) => {
           Something went wrong, please try again!
         </Alert>
         }
-
       </Snackbar>
     </>
   );

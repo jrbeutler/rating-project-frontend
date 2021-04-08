@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { Button, Typography } from "@material-ui/core";
 import AddCategory from "../../components/AddCategory/AddCategory";
 import { SessionContext } from "../../App";
+import AddUser from "../../components/AddUser/AddUser";
 
 const AdminPanel: React.FC = () => {
   const [currentTab, setCurrentTab] = useState("Categories");
@@ -23,7 +24,7 @@ const AdminPanel: React.FC = () => {
           <AddCategory sessionToken={sessionContext.sessionToken} />
         }
         {currentTab === "Users" &&
-          <p>users</p>
+          <AddUser sessionToken={sessionContext.sessionToken} />
         }
       </section>
     </main>
