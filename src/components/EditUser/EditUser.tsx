@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, createStyles, FormLabel, MenuItem, Select } from "@material-ui/core";
+import { Button, createStyles, FormLabel, MenuItem, Select, Typography } from "@material-ui/core";
 import { activateUser, archiveUser, getAllUsers, updateUserPosition } from "../../utils/requests/User";
 import { makeStyles } from "@material-ui/core/styles";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -20,6 +20,14 @@ type User = {
 
 const useStyles = makeStyles(() =>
   createStyles({
+    editTitle: {
+      marginTop: '2.5rem',
+      marginBottom: '0.25rem',
+      fontSize: '2rem',
+      width: '50%',
+      margin: 'auto',
+      textAlign: 'left',
+    },
     editUserSection: {
       backgroundColor: '#909090',
       '@media only screen and (max-width: 1050px)': {
@@ -143,6 +151,7 @@ const EditUser: React.FC<EditUserProps> = ({sessionToken}) => {
 
   return (
     <>
+      <Typography variant={"h2"} className={classes.editTitle}>Change User Role</Typography>
       <section className={classes.editUserSection}>
         <form className={classes.editUserForm} onSubmit={e => {
           e.preventDefault();
@@ -174,6 +183,7 @@ const EditUser: React.FC<EditUserProps> = ({sessionToken}) => {
           <Button type='submit' className={classes.submitButton}>Submit</Button>
         </form>
       </section>
+      <Typography variant={"h2"} className={classes.editTitle}>Archive User</Typography>
       <section className={classes.editUserSection}>
         <form className={classes.editUserForm} onSubmit={e => {
           e.preventDefault()
@@ -194,6 +204,7 @@ const EditUser: React.FC<EditUserProps> = ({sessionToken}) => {
           <Button className={classes.submitButton} type='submit'>Archive user</Button>
         </form>
       </section>
+      <Typography variant={"h2"} className={classes.editTitle}>Reactivate User</Typography>
       <section className={classes.editUserSection}>
         <form className={classes.editUserForm} onSubmit={e => {
           e.preventDefault();

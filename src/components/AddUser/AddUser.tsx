@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, FormLabel, MenuItem, Select, TextField } from "@material-ui/core";
+import { Button, FormLabel, MenuItem, Select, TextField, Typography } from "@material-ui/core";
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -15,6 +15,14 @@ const Alert = (props: AlertProps) => {
 
 const useStyles = makeStyles(() =>
   createStyles({
+    addUserTitle: {
+      marginTop: '2.5rem',
+      marginBottom: '0.25rem',
+      fontSize: '2rem',
+      width: '50%',
+      margin: 'auto',
+      textAlign: 'left',
+    },
     addUserSection: {
       backgroundColor: '#909090',
       '@media only screen and (max-width: 1050px)': {
@@ -110,6 +118,7 @@ const AddUser: React.FC<AddUserProps> = ({sessionToken}) => {
 
   return (
     <>
+      <Typography variant={"h2"} className={classes.addUserTitle}>Add User</Typography>
       <section className={classes.addUserSection}>
         <form className={classes.addUserForm} onSubmit={e => {
           e.preventDefault();

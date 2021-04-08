@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import { Button, FormLabel, MenuItem, Select } from "@material-ui/core";
+import { Button, FormLabel, MenuItem, Select, Typography } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import Snackbar from "@material-ui/core/Snackbar";
 import { activateCategory, archiveCategory, getAllCategories } from "../../utils/requests/Category";
@@ -17,6 +17,14 @@ type Category = {
 
 const useStyles = makeStyles(() =>
   createStyles({
+    editCategoryTitle: {
+      marginTop: '2.5rem',
+      marginBottom: '0.25rem',
+      fontSize: '2rem',
+      width: '50%',
+      margin: 'auto',
+      textAlign: 'left',
+    },
     editCategorySection: {
       backgroundColor: '#909090',
       '@media only screen and (max-width: 1050px)': {
@@ -121,6 +129,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({sessionToken}) => {
 
   return (
     <>
+      <Typography variant={"h2"} className={classes.editCategoryTitle}>Archive Category</Typography>
       <section className={classes.editCategorySection}>
         <form className={classes.editCategoryForm} onSubmit={e => {
           e.preventDefault();
@@ -141,6 +150,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({sessionToken}) => {
           <Button className={classes.submitButton} type='submit'>Archive Category</Button>
         </form>
       </section>
+      <Typography variant={"h2"} className={classes.editCategoryTitle}>Reactivate Category</Typography>
       <section className={classes.editCategorySection}>
         <form className={classes.editCategoryForm} onSubmit={e => {
           e.preventDefault();

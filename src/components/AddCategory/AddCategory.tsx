@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, FormLabel, TextField } from "@material-ui/core";
+import { Button, FormLabel, TextField, Typography } from "@material-ui/core";
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -15,6 +15,14 @@ const Alert = (props: AlertProps) => {
 
 const useStyles = makeStyles(() =>
   createStyles({
+    addCategoryTitle: {
+      marginTop: '2.5rem',
+      marginBottom: '0.25rem',
+      fontSize: '2rem',
+      width: '50%',
+      margin: 'auto',
+      textAlign: 'left',
+    },
     addCategorySection: {
       backgroundColor: '#909090',
       '@media only screen and (max-width: 1050px)': {
@@ -92,6 +100,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({sessionToken}) => {
 
   return (
     <>
+      <Typography variant={"h2"} className={classes.addCategoryTitle}>Add Category</Typography>
       <section className={classes.addCategorySection}>
         <form className={classes.categoryForm} onSubmit={e => {
           e.preventDefault();
