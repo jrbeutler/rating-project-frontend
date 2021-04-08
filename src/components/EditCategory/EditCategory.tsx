@@ -3,7 +3,7 @@ import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { Button, FormLabel, MenuItem, Select } from "@material-ui/core";
 import { Alert } from "@material-ui/lab";
 import Snackbar from "@material-ui/core/Snackbar";
-import { archiveCategory, getAllCategories } from "../../utils/requests/Category";
+import { activateCategory, archiveCategory, getAllCategories } from "../../utils/requests/Category";
 
 type EditCategoryProps = {
   sessionToken: string,
@@ -64,15 +64,16 @@ const useStyles = makeStyles(() =>
 
 const EditCategory: React.FC<EditCategoryProps> = ({sessionToken}) => {
   const classes = useStyles();
-  const [activeCategories, setActiveCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedArchivedCategory, setSelectedArchivedCategory] = useState<string>('');
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
   const [alertType, setAlertType] = useState("successful");
 
   useEffect(() => {
     getAllCategories().then(response => {
       if (response.data) {
-        setActiveCategories(response.data.getAllCategories);
+        setCategories(response.data.getAllCategories);
       } else {
         console.log(response);
       }
@@ -90,6 +91,10 @@ const EditCategory: React.FC<EditCategoryProps> = ({sessionToken}) => {
     setSelectedCategory(event.target.value as string);
   }
 
+  const handleArchivedCategorySelect = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedArchivedCategory(event.target.value as string);
+  }
+
   const submitArchiveCategory = () => {
     archiveCategory(sessionToken, selectedCategory).then(response => {
       if (response.data) {
@@ -98,7 +103,18 @@ const EditCategory: React.FC<EditCategoryProps> = ({sessionToken}) => {
       } else {
         setAlertOpen(true);
         setAlertType("failed");
-        console.log(response);
+      }
+    })
+  }
+
+  const submitActivateCategory = () => {
+    activateCategory(sessionToken, selectedArchivedCategory).then(response => {
+      if (response.data) {
+        setAlertOpen(true);
+        setAlertType("successful");
+      } else {
+        setAlertOpen(true);
+        setAlertType("failed");
       }
     })
   }
@@ -116,7 +132,7 @@ const EditCategory: React.FC<EditCategoryProps> = ({sessionToken}) => {
             value={selectedCategory}
             onChange={handleCategorySelect}
           >
-            {activeCategories.map(category => {
+            {categories.map(category => {
                 return category.isActive && <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
             })
             }
@@ -124,10 +140,30 @@ const EditCategory: React.FC<EditCategoryProps> = ({sessionToken}) => {
           <Button className={classes.submitButton} type='submit'>Archive Category</Button>
         </form>
       </section>
+      <section className={classes.editCategorySection}>
+        <form className={classes.editCategoryForm} onSubmit={e => {
+          e.preventDefault();
+          submitActivateCategory();
+        }}>
+          <FormLabel className={classes.formLabels} required>Category</FormLabel>
+          <Select
+            className={classes.selectBox}
+            required
+            value={selectedArchivedCategory}
+            onChange={handleArchivedCategorySelect}
+          >
+            {categories.map(category => {
+              return !category.isActive && <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
+            })
+            }
+          </Select>
+          <Button className={classes.submitButton} type='submit'>Activate Category</Button>
+        </form>
+      </section>
       <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
         {alertType === "successful" ?
           <Alert onClose={handleClose} severity={"success"}>
-            Changed User Position!
+            Changed Category Information!
           </Alert> :
           <Alert onClose={handleClose} severity={"error"}>
             Something went wrong, please try again!

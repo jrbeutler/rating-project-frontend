@@ -93,3 +93,25 @@ export async function archiveCategory(sessionToken: string, categoryID: string) 
   });
   return await response.json();
 }
+
+export async function activateCategory(sessionToken: string, categoryID: string) {
+  const response = await fetch(config.apiURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionToken}`
+    },
+    body: JSON.stringify({
+      query: `
+        mutation {
+          activateCategory(categoryID: "${categoryID}") {
+            id
+            name
+            isActive
+          }
+        }
+      `
+    })
+  });
+  return await response.json();
+}
