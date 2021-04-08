@@ -1,31 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Button, FormLabel, MenuItem, Select, TextField, Typography } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { UserContext } from "../../App";
-import { useHistory } from "react-router-dom";
-import { createUser, getCurrentUser } from "../../utils/requests/User";
+import React, { useState } from "react";
+import { Button, FormLabel, MenuItem, Select, TextField } from "@material-ui/core";
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
+import { createUser } from "../../utils/requests/User";
 
-function Alert(props: AlertProps) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+type AddUserProps = {
+  sessionToken: string,
+};
 
-const useStyles = makeStyles((theme: Theme) =>
+const Alert = (props: AlertProps) => {
+  return <MuiAlert elevation={6} variant={"filled"} {...props} />;
+};
+
+const useStyles = makeStyles(() =>
   createStyles({
-    addUserPage: {
-      backgroundColor: '#85CAB0',
-      width: '100%',
-      height: '100vh',
-      '@media only screen and (max-width: 320px)': {
-        height: '700px',
-      },
-      paddingTop: '0.5rem',
-    },
-    title: {
-      fontSize: '2.5rem',
-      margin: '1.25rem',
-    },
     addUserSection: {
       backgroundColor: '#909090',
       '@media only screen and (max-width: 1050px)': {
@@ -33,6 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       width: '50%',
       margin: 'auto',
+      boxShadow: '0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.20)',
       borderRadius: '20px',
     },
     addUserForm: {
@@ -79,34 +69,16 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const AddUser: React.FC = () => {
+const AddUser: React.FC<AddUserProps> = ({sessionToken}) => {
   const classes = useStyles();
-  const history = useHistory();
-  const userContext = useContext(UserContext);
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [role, setRole] = useState<string>('USER');
+  const [role, setRole] = useState<string>('APPRENTICE');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [open, setOpen] = useState<boolean>(false);
-
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
-
-  useEffect(() => {
-    if (sessionToken) {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          const user = response.data.me;
-          userContext.setCurrentUser(user);
-        } else {
-          history.push('/login');
-        }
-      });
-    } else {
-      history.push('/login');
-    }
-  }, []);
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [alertType, setAlertType] = useState("successful");
 
   const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setRole(event.target.value as string);
@@ -119,9 +91,11 @@ const AddUser: React.FC = () => {
     if (password === confirmPassword) {
       createUser(sessionToken, firstName, lastName, email, role, password).then(response => {
         if (response.data) {
-          setOpen(true);
+          setAlertOpen(true);
+          setAlertType("successful");
         } else {
-          //handle error
+          setAlertOpen(true);
+          setAlertType("failed");
         }
       })
     }
@@ -131,12 +105,11 @@ const AddUser: React.FC = () => {
     if (reason === 'clickaway') {
       return;
     }
-    setOpen(false);
+    setAlertOpen(false);
   };
 
-  return(
-    <section className={classes.addUserPage}>
-      <Typography variant='h1' className={classes.title}>Add a User</Typography>
+  return (
+    <>
       <section className={classes.addUserSection}>
         <form className={classes.addUserForm} onSubmit={e => {
           e.preventDefault();
@@ -170,12 +143,13 @@ const AddUser: React.FC = () => {
           </TextField>
           <FormLabel required className={classes.formLabels}>Role</FormLabel>
           <Select
-           required
-           className={classes.selectBox}
-           value={role}
-           onChange={handleRoleChange}
+            required
+            className={classes.selectBox}
+            value={role}
+            onChange={handleRoleChange}
           >
-            <MenuItem value={"USER"}>USER</MenuItem>
+            <MenuItem value={"APPRENTICE"}>APPRENTICE</MenuItem>
+            <MenuItem value={"FTE"}>Full-Time Employee</MenuItem>
             <MenuItem value={"ADMIN"}>ADMIN</MenuItem>
           </Select>
           <FormLabel required className={classes.formLabels}>Password</FormLabel>
@@ -199,12 +173,18 @@ const AddUser: React.FC = () => {
           <Button type='submit' className={classes.submitButton}>Submit</Button>
         </form>
       </section>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success">
-          Successful!
-        </Alert>
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
+        {alertType === "successful" ?
+          <Alert onClose={handleClose} severity={"success"}>
+            Added Category!
+          </Alert> :
+          <Alert onClose={handleClose} severity={"error"}>
+            Something went wrong, please try again!
+          </Alert>
+        }
       </Snackbar>
-    </section>
+    </>
   );
 };
+
 export default AddUser;

@@ -232,8 +232,8 @@ const Account: React.FC = () => {
           <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
           <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.01} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
           {userContext.currentUser.role === 'ADMIN' &&
-            <NavLink exact to='/addCategory' className={classes.link}>
-              <Button variant='contained'>Add Category</Button>
+            <NavLink exact to='/manage' className={classes.link}>
+              <Button variant='contained'>Manage Content</Button>
             </NavLink>
           }
         </article>
