@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import {NavLink, useHistory, useParams, useLocation} from 'react-router-dom';
-import { format, parseISO } from "date-fns";
-import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
+import { format, parseISO, toDate } from "date-fns";
 import { UserContext } from "../../App";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { Button, MenuItem, Select, Typography, useMediaQuery } from "@material-ui/core";
@@ -9,11 +8,11 @@ import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingC
 import {
   getCategoryAverages,
   getOverallRatingAverage,
-  getRatingsCreated,
+  getRatingsCreated, getUserRatings
 } from "../../utils/requests/Rating";
-import {getCurrentUser, getUserByID} from "../../utils/requests/User";
 import { Rating } from '@material-ui/lab';
 import { RadioButtonChecked } from '@material-ui/icons';
+import Chart from "react-google-charts";
 
 interface ParamTypes {
   apprenticeID: string
@@ -25,7 +24,7 @@ type CategoryAverages = [{
   average: number;
 }]
 
-type UserCreatedRatings = [{
+type UserRatings = [{
     id: string,
     createdAt: string,
     categoryID: string,
@@ -54,16 +53,7 @@ const useStyles = makeStyles((theme) =>
       justifyContent: 'space-evenly',
       alignItems: 'center',
       paddingTop: '0.5rem',
-    },
-    profileImage: {
-      [theme.breakpoints.down("sm")]:{
-        width: '10rem',
-        height: 'auto',
-      },
-      [theme.breakpoints.up("md")]:{
-        width: '16rem',
-        height: 'auto',
-      },
+      marginBottom: '2rem',
     },
     name: {
       [theme.breakpoints.down("sm")]:{
@@ -76,6 +66,12 @@ const useStyles = makeStyles((theme) =>
       fontWeight: 'normal',
       paddingBottom: '0.5rem',
       borderBottom: 'solid 2px',
+    },
+    chartSection: {
+      marginTop: '2rem'
+    },
+    chart: {
+      boxShadow: '0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.20)',
     },
     role: {
       [theme.breakpoints.down("sm")]:{
@@ -166,58 +162,48 @@ const Account: React.FC = () => {
   const userContext = useContext(UserContext);
   const history = useHistory();
   let location = useLocation();
-  const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>();
+  const [userCreatedRatings, setUserCreatedRatings] = useState<UserRatings>();
   const [overallRating, setOverallRating] = useState<number>(0);
+  const [chartPoints, setChartPoints] = useState<Array<Array<any>>>([['Time', 'Rating']]);
+  const [userRatings, setUserRatings] = useState<UserRatings>();
   const [averageCategoryRatings, setAverageCategoryRatings] = useState<CategoryAverages>();
   const [currentTab, setCurrentTab] = useState<string>("Given");
   const ratingSelectView = useMediaQuery('(max-width: 1050px)');
   let { apprenticeID } = useParams<ParamTypes>();
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
-    if (sessionToken) {
-      if (apprenticeID != null){
-        getUserByID(sessionToken, apprenticeID).then(response => {
-          if (response.data) {
-            const apprentice = response.data.userByID;
-            userContext.setCurrentUser(apprentice);
-            getOverallRatingAverage(sessionToken, apprentice.id).then(response => {
-              setOverallRating(response.data.userOverallAverage);
-            });
-            getCategoryAverages(sessionToken, apprentice.id).then(response => {
-              setAverageCategoryRatings(response.data.userRatingCategoryAverages);
-            });
-            getRatingsCreated(sessionToken, apprentice.id).then(response => {
-              setUserCreatedRatings(response.data.userReviewedRatings);
-            })
-          } else {
-            history.push('/login');
-          }
-        });
-      }
-      else {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          const user = response.data.me;
-          userContext.setCurrentUser(user);
-          getOverallRatingAverage(sessionToken, user.id).then(response => {
-            setOverallRating(response.data.userOverallAverage);
-          });
-          getCategoryAverages(sessionToken, user.id).then(response => {
-            console.log(response);
-            setAverageCategoryRatings(response.data.userRatingCategoryAverages);
-          });
-          getRatingsCreated(sessionToken, user.id).then(response => {
-            setUserCreatedRatings(response.data.userReviewedRatings);
-          })
-        } else {
-          history.push('/login');
-        }
-      });
-    }} else {
-      history.push('/login');
+    let userID;
+    if (location.pathname === '/') {
+      userID = userContext.currentUser.id;
+    } else {
+      userID = apprenticeID;
     }
-  }, []);
+    getOverallRatingAverage(userID).then(response => {
+      setOverallRating(response.data.userOverallAverage);
+    });
+    getCategoryAverages(userID).then(response => {
+      setAverageCategoryRatings(response.data.userRatingCategoryAverages);
+    });
+    getRatingsCreated(userID).then(response => {
+      setUserCreatedRatings(response.data.userReviewedRatings);
+    });
+    getUserRatings(userID).then(response => {
+      setUserRatings(response.data.userRatings);
+    })
+  }, [apprenticeID, location.pathname, userContext.currentUser.id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line array-callback-return
+    userRatings?.map(rating => {
+      const createdDate = parseISO(rating.createdAt);
+      const formattedDate = toDate(createdDate);
+      let newChartPoints = chartPoints;
+      newChartPoints.push([formattedDate, rating.rating]);
+      console.log(rating);
+      // @ts-ignore
+      setChartPoints(newChartPoints);
+    });
+  }, [userRatings])
 
   const handleTabChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setCurrentTab(event.target.value as string);
@@ -226,7 +212,6 @@ const Account: React.FC = () => {
   return (
     <section className={classes.accountPage}>
       <section className={classes.profile}>
-        <img src={ProfilePlaceholder} title='Profile' className={classes.profileImage}  alt='Profile'/>
         <article>
           <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
           <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
@@ -236,6 +221,24 @@ const Account: React.FC = () => {
               <Button variant='contained'>Manage Content</Button>
             </NavLink>
           }
+        </article>
+        <article className={classes.chartSection}>
+        {(userRatings && userRatings.length > 0) ?
+          <Chart
+            className={classes.chart}
+            chartType="ScatterChart"
+            loader={<div>Loading Chart</div>}
+            data={chartPoints}
+            options={{
+              title: ' Ratings Over Time',
+              hAxis: { title: 'Time' },
+              vAxis: { title: 'Rating' },
+              legend: 'none',
+              trendlines: { 0: {} },
+            }}
+            rootProps={{ 'data-testid': '1' }} /> :
+            <Typography variant={"h5"}>No ratings received!</Typography>
+        }
         </article>
       </section>
       <section className={classes.tabSection}>

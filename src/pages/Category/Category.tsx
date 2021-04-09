@@ -135,7 +135,6 @@ const Category: React.FC = () => {
       newChartPoints.push([formattedDate, rating.rating]);
       // @ts-ignore
       setChartPoints(newChartPoints);
-      console.log(chartPoints);
     });
   }, [userRatings])
 
