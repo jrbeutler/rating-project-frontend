@@ -2,15 +2,11 @@ import config from "../../config";
 
 // This file contains all network requests related to the categories table.
 
-export async function getCategoryByID(sessionToken: string | null, categoryID: string) {
-  if (sessionToken === '') {
-    return null;
-  }
+export async function getCategoryByID(categoryID: string) {
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `

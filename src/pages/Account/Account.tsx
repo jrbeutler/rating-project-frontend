@@ -6,23 +6,17 @@ import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { Button, MenuItem, Select, Typography, useMediaQuery } from "@material-ui/core";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
 import {
-  getCategoryAverages,
   getOverallRatingAverage,
   getRatingsCreated, getUserRatings
 } from "../../utils/requests/Rating";
 import { Rating } from '@material-ui/lab';
 import { RadioButtonChecked } from '@material-ui/icons';
 import Chart from "react-google-charts";
+import { getCategoryByID } from "../../utils/requests/Category";
 
 interface ParamTypes {
   apprenticeID: string
 }
-
-type CategoryAverages = [{
-  name: string;
-  categoryID: string;
-  average: number;
-}]
 
 type UserRatings = [{
     id: string,
@@ -157,6 +151,22 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
+function groupBy(collection: any, property: string) {
+  let i = 0, val, index,
+    values = [], result = [];
+  for (; i < collection.length; i++) {
+    val = collection[i][property];
+    index = values.indexOf(val);
+    if (index > -1)
+      result[index].push(collection[i]);
+    else {
+      values.push(val);
+      result.push([collection[i]]);
+    }
+  }
+  return result;
+}
+
 const Account: React.FC = () => {
   const classes = useStyles();
   const userContext = useContext(UserContext);
@@ -166,7 +176,7 @@ const Account: React.FC = () => {
   const [overallRating, setOverallRating] = useState<number>(0);
   const [chartPoints, setChartPoints] = useState<Array<Array<any>>>([['Time', 'Rating']]);
   const [userRatings, setUserRatings] = useState<UserRatings>();
-  const [averageCategoryRatings, setAverageCategoryRatings] = useState<CategoryAverages>();
+  const [averageCategoryRatings, setAverageCategoryRatings] = useState<Array<any>>([]);
   const [currentTab, setCurrentTab] = useState<string>("Given");
   const ratingSelectView = useMediaQuery('(max-width: 1050px)');
   let { apprenticeID } = useParams<ParamTypes>();
@@ -181,15 +191,35 @@ const Account: React.FC = () => {
     getOverallRatingAverage(userID).then(response => {
       setOverallRating(response.data.userOverallAverage);
     });
-    getCategoryAverages(userID).then(response => {
-      setAverageCategoryRatings(response.data.userRatingCategoryAverages);
-    });
     getRatingsCreated(userID).then(response => {
       setUserCreatedRatings(response.data.userReviewedRatings);
     });
     getUserRatings(userID).then(response => {
-      setUserRatings(response.data.userRatings);
-    })
+      const allRatings = response.data.userRatings;
+      setUserRatings(allRatings);
+      const ratingsByCategory = groupBy(allRatings, "categoryID");
+      let categoryID: string = '';
+      let average: number = 0;
+      let newCategoryAverageRatings: Array<any> = [];
+      ratingsByCategory.forEach(categoryGroup => {
+        categoryID = categoryGroup[0].categoryID;
+        getCategoryByID(categoryID).then(response => {
+          let summedRatings = 0;
+          categoryGroup.forEach(rating => {
+            summedRatings += rating.rating;
+          });
+          average = summedRatings / categoryGroup.length;
+          const categoryAverageGroup =
+            {
+              "name": response.data.getCategoryByID.name,
+              "categoryID": categoryID,
+              "average": average,
+            };
+          newCategoryAverageRatings.push(categoryAverageGroup);
+        });
+      });
+      setAverageCategoryRatings(newCategoryAverageRatings);
+    });
   }, [apprenticeID, location.pathname, userContext.currentUser.id]);
 
   useEffect(() => {
@@ -199,7 +229,6 @@ const Account: React.FC = () => {
       const formattedDate = toDate(createdDate);
       let newChartPoints = chartPoints;
       newChartPoints.push([formattedDate, rating.rating]);
-      console.log(rating);
       // @ts-ignore
       setChartPoints(newChartPoints);
     });
@@ -208,6 +237,8 @@ const Account: React.FC = () => {
   const handleTabChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setCurrentTab(event.target.value as string);
   };
+
+  console.log(averageCategoryRatings);
 
   return (
     <section className={classes.accountPage}>

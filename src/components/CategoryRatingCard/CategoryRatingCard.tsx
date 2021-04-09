@@ -46,13 +46,11 @@ const CategoryRatingCard: React.FC<RatingProps> = ({
 
   const [reviewedName, setReviewedName] = useState<string>('');
 
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
-
   useEffect(() => {
     if (!reviewedID) {
       return;
     }
-    getUserByID(sessionToken, reviewedID).then((r) => {
+    getUserByID(reviewedID).then((r) => {
       const user = r.data.userByID;
       setReviewedName(user.firstname + ' ' + user.lastname);
     });

@@ -91,11 +91,11 @@ const Category: React.FC = () => {
   useEffect(() => {
     if (sessionToken) {
       if (apprenticeID != null){
-        getUserByID(sessionToken, apprenticeID).then(response => {
+        getUserByID(apprenticeID).then(response => {
           if (response.data) {
             const apprentice = response.data.userByID;
             userContext.setCurrentUser(apprentice);
-            getCategoryByID(sessionToken, categoryID).then(response => {
+            getCategoryByID(categoryID).then(response => {
               setCategoryName(response.data.getCategoryByID.name);
             });
             getUserCategoryRatings(sessionToken, apprentice.id, categoryID).then(response => {
@@ -111,7 +111,7 @@ const Category: React.FC = () => {
           if (response.data) {
             const user = response.data.me;
             userContext.setCurrentUser(user);
-            getCategoryByID(sessionToken, categoryID).then(response => {
+            getCategoryByID(categoryID).then(response => {
               setCategoryName(response.data.getCategoryByID.name);
             });
             getUserCategoryRatings(sessionToken, user.id, categoryID).then(response => {

@@ -47,15 +47,11 @@ export async function refreshToken(sessionToken: string) {
   return await response.json();
 }
 
-export async function getUserByID(sessionToken: string | null, userID: string) {
-  if (sessionToken === '') {
-    return null;
-  }
+export async function getUserByID(userID: string) {
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
