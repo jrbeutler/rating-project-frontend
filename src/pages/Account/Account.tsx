@@ -278,7 +278,7 @@ const Account: React.FC = () => {
             options={{
               title: ' Ratings Over Time',
               hAxis: { title: 'Time' },
-              vAxis: { title: 'Rating' },
+              vAxis: { title: 'Rating', minValue: 0, maxValue: 5 },
               legend: 'none',
               trendlines: { 0: {} },
             }}

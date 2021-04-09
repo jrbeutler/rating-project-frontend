@@ -107,7 +107,7 @@ const Header: React.FC = () => {
       <AppBar position="static" className={classes.header}>
         <Toolbar>
           <NavLink exact to='/'>
-          <img src={logo} title='EduSource' alt='EduSource' className={classes.logo} />
+            <img src={logo} title='EduSource' alt='EduSource' className={classes.logo} />
           </NavLink>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>

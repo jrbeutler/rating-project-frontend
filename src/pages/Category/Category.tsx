@@ -83,49 +83,25 @@ const Category: React.FC = () => {
   let { categoryID } = useParams<ParamTypes>();
   let { apprenticeID } = useParams<ParamTypes>();
   const userContext = useContext(UserContext);
-  const history = useHistory();
   let apprenticePage = '/apprentice/' + apprenticeID;
 
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
-
   useEffect(() => {
-    if (sessionToken) {
-      if (apprenticeID != null){
-        getUserByID(apprenticeID).then(response => {
-          if (response.data) {
-            const apprentice = response.data.userByID;
-            userContext.setCurrentUser(apprentice);
-            getCategoryByID(categoryID).then(response => {
-              setCategoryName(response.data.getCategoryByID.name);
-            });
-            getUserCategoryRatings(sessionToken, apprentice.id, categoryID).then(response => {
-              setUserRatings(response.data.userRatingsByCategory);
-            });
-          } else {
-            history.push('/login');
-          }
-        });
-      }
-      else{
-        getCurrentUser(sessionToken).then(response => {
-          if (response.data) {
-            const user = response.data.me;
-            userContext.setCurrentUser(user);
-            getCategoryByID(categoryID).then(response => {
-              setCategoryName(response.data.getCategoryByID.name);
-            });
-            getUserCategoryRatings(sessionToken, user.id, categoryID).then(response => {
-              setUserRatings(response.data.userRatingsByCategory);
-            });
-          } else {
-            history.push('/login');
-          }
-        });
-      }
+    if (location.pathname.includes('/apprentice/')) {
+      getCategoryByID(categoryID).then(response => {
+        setCategoryName(response.data.getCategoryByID.name);
+      });
+      getUserCategoryRatings(apprenticeID, categoryID).then(response => {
+        setUserRatings(response.data.userRatingsByCategory);
+      });
     } else {
-      history.push('/login');
+      getCategoryByID(categoryID).then(response => {
+        setCategoryName(response.data.getCategoryByID.name);
+      });
+      getUserCategoryRatings(userContext.currentUser.id, categoryID).then(response => {
+        setUserRatings(response.data.userRatingsByCategory);
+      });
     }
-  }, [categoryID]);
+  }, [apprenticeID, categoryID, location.pathname, userContext.currentUser.id]);
 
   useEffect(() => {
     userRatings?.map(rating => {
@@ -153,7 +129,7 @@ const Category: React.FC = () => {
             options={{
               title: categoryName + ' Ratings Over Time',
               hAxis: { title: 'Time' },
-              vAxis: { title: 'Rating' },
+              vAxis: { title: 'Rating', minValue: 0, maxValue: 5 },
               legend: 'none',
               trendlines: { 0: {} },
             }}

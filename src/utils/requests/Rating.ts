@@ -68,15 +68,11 @@ export async function getUserRatings(userID: string) {
   return await response.json();
 }
 
-export async function getUserCategoryRatings(sessionToken: string | null, userID: string, categoryID: string) {
-  if (sessionToken === '') {
-    return null;
-  }
+export async function getUserCategoryRatings(userID: string, categoryID: string) {
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
