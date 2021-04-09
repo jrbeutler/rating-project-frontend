@@ -261,8 +261,8 @@ const Account: React.FC = () => {
         <article>
           <Typography variant='h1' className={classes.name}>{userName}</Typography>
           <Typography variant='h2' className={classes.role}>{role}</Typography>
-          <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.01} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
-          {(userContext.currentUser.role === 'ADMIN' && location.pathname !== '/') &&
+          <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.2} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
+          {((userContext.currentUser.role === 'FTE' || userContext.currentUser.role === 'ADMIN') && location.pathname === '/') &&
             <NavLink exact to='/manage' className={classes.link}>
               <Button variant='contained'>Manage Content</Button>
             </NavLink>
@@ -307,7 +307,9 @@ const Account: React.FC = () => {
             onChange={handleTabChange}
           >
             <MenuItem value={"Categories"}>Rating Categories</MenuItem>
-            <MenuItem value={"Given"}>Ratings Given</MenuItem>
+            {location.pathname === '/' &&
+              <MenuItem value={"Given"}>Ratings Given</MenuItem>
+            }
           </Select>
         }
         {currentTab === "Categories" ?
