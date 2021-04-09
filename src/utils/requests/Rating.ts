@@ -43,21 +43,18 @@ export async function rate(
   return await response.json();
 }
 
-export async function getUserRatings(sessionToken: string | null, userID: string) {
-  if (sessionToken === '') {
-    return null;
-  }
+export async function getUserRatings(userID: string) {
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
         query {
           userRatings(reviewedID: "${userID}") {
             id,
+            createdAt,
             reviewedID,
             reviewerID,
             rating,
@@ -71,15 +68,11 @@ export async function getUserRatings(sessionToken: string | null, userID: string
   return await response.json();
 }
 
-export async function getUserCategoryRatings(sessionToken: string | null, userID: string, categoryID: string) {
-  if (sessionToken === '') {
-    return null;
-  }
+export async function getUserCategoryRatings(userID: string, categoryID: string) {
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
@@ -105,15 +98,11 @@ export async function getUserCategoryRatings(sessionToken: string | null, userID
   return await response.json();
 }
 
-export async function getOverallRatingAverage(sessionToken: string | null, userID: string) {
-  if (sessionToken === '') {
-    return null;
-  }
+export async function getOverallRatingAverage(userID: string) {
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
@@ -126,15 +115,11 @@ export async function getOverallRatingAverage(sessionToken: string | null, userI
   return await response.json();
 }
 
-export async function getCategoryAverages(sessionToken: string | null, userID: string) {
-  if (sessionToken === '') {
-    return null;
-  }
+export async function getCategoryAverages(userID: string) {
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `
@@ -151,15 +136,11 @@ export async function getCategoryAverages(sessionToken: string | null, userID: s
   return await response.json();
 }
 
-export async function getRatingsCreated(sessionToken: string | null, userID: string) {
-  if (sessionToken === '') {
-    return null;
-  }
+export async function getRatingsCreated(userID: string) {
   const response = await fetch(config.apiURL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`
     },
     body: JSON.stringify({
       query: `

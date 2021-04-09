@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
 import { getUserCategoryRatings } from "../../utils/requests/Rating";
-import { getCurrentUser } from "../../utils/requests/User";
+import { getCurrentUser, getUserByID } from "../../utils/requests/User";
 import { UserContext } from "../../App";
 import { NavLink } from "react-router-dom";
 import { getCategoryByID } from "../../utils/requests/Category";
@@ -13,6 +13,7 @@ import { Typography } from "@material-ui/core";
 
 interface ParamTypes {
   categoryID: string
+  apprenticeID: string
 }
 
 
@@ -76,34 +77,31 @@ const Category: React.FC = () => {
   const classes = useStyles();
   const [userRatings, setUserRatings] = useState<UserRatings>();
   const [categoryName, setCategoryName] = useState<string>('');
+  let location = useLocation();
   const [chartPoints, setChartPoints] = useState<Array<Array<any>>>([['Time', 'Rating']]);
 
   let { categoryID } = useParams<ParamTypes>();
+  let { apprenticeID } = useParams<ParamTypes>();
   const userContext = useContext(UserContext);
-  const history = useHistory();
-
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
+  let apprenticePage = '/apprentice/' + apprenticeID;
 
   useEffect(() => {
-    if (sessionToken) {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          const user = response.data.me;
-          userContext.setCurrentUser(user);
-          getCategoryByID(sessionToken, categoryID).then(response => {
-            setCategoryName(response.data.getCategoryByID.name);
-          });
-          getUserCategoryRatings(sessionToken, user.id, categoryID).then(response => {
-            setUserRatings(response.data.userRatingsByCategory);
-          });
-        } else {
-          history.push('/login');
-        }
+    if (location.pathname.includes('/apprentice/')) {
+      getCategoryByID(categoryID).then(response => {
+        setCategoryName(response.data.getCategoryByID.name);
+      });
+      getUserCategoryRatings(apprenticeID, categoryID).then(response => {
+        setUserRatings(response.data.userRatingsByCategory);
       });
     } else {
-      history.push('/login');
+      getCategoryByID(categoryID).then(response => {
+        setCategoryName(response.data.getCategoryByID.name);
+      });
+      getUserCategoryRatings(userContext.currentUser.id, categoryID).then(response => {
+        setUserRatings(response.data.userRatingsByCategory);
+      });
     }
-  }, [categoryID]);
+  }, [apprenticeID, categoryID, location.pathname, userContext.currentUser.id]);
 
   useEffect(() => {
     userRatings?.map(rating => {
@@ -113,7 +111,6 @@ const Category: React.FC = () => {
       newChartPoints.push([formattedDate, rating.rating]);
       // @ts-ignore
       setChartPoints(newChartPoints);
-      console.log(chartPoints);
     });
   }, [userRatings])
 
@@ -121,7 +118,6 @@ const Category: React.FC = () => {
     <div className={classes.categoryPage}>
       <Typography variant={"h4"} className={classes.categoryName}>{categoryName}</Typography>
       {(userRatings && userRatings.length > 0) &&
-      <React.Fragment>
         <section className={classes.chartSection}>
           <Chart
             className={classes.chart}
@@ -133,27 +129,27 @@ const Category: React.FC = () => {
             options={{
               title: categoryName + ' Ratings Over Time',
               hAxis: { title: 'Time' },
-              vAxis: { title: 'Rating' },
+              vAxis: { title: 'Rating', minValue: 0, maxValue: 5 },
               legend: 'none',
               trendlines: { 0: {} },
             }}
-            rootProps={{ 'data-testid': '1' }}
-          />
+            rootProps={{ 'data-testid': '1' }} />
         </section>
-        <ul className={classes.reviewedList}>
-          {userRatings.map(userRating => {
-            const createdDate = parseISO(userRating.createdAt);
-            const formattedDate = format(createdDate, "MM/dd/yyyy");
-            return <CategoryRatingCard
-              createdAt={formattedDate}
-              rating={userRating.rating}
-              notes={userRating.notes}
-            />
-          })
-          }
-        </ul>
-      </React.Fragment>
       }
+      {location.pathname === '/category/' + categoryID && <NavLink exact to='/'>&#8592; Back</NavLink> }
+      {location.pathname === '/apprentice/' + apprenticeID + '/category/' + categoryID && <NavLink exact to={(apprenticePage)}>&#8592; Back</NavLink> }
+      <ul className={classes.reviewedList}>
+        {(userRatings && userRatings.length > 0) &&
+        userRatings.map(userRating => {
+          const createdDate = parseISO(userRating.createdAt);
+          const formattedDate = format(createdDate, "MM/dd/yyyy");
+          return <CategoryRatingCard
+            createdAt={formattedDate}
+            rating={userRating.rating}
+            notes={userRating.notes}
+          />
+      })}
+      </ul>
     </div>
   );
 };

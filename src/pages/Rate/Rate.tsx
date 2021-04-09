@@ -1,13 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../App";
-import { useHistory } from "react-router-dom";
+import { SessionContext, UserContext } from "../../App";
 import { Button, FormLabel, MenuItem, Typography } from "@material-ui/core";
 import Select from '@material-ui/core/Select';
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import { rate } from "../../utils/requests/Rating";
-import { getAllUsers, getCurrentUser } from "../../utils/requests/User";
+import { getAllUsers } from "../../utils/requests/User";
 import { getAllCategories } from "../../utils/requests/Category";
 import { Rating } from '@material-ui/lab';
 import { RadioButtonChecked } from '@material-ui/icons';
@@ -22,11 +21,13 @@ type AllUser = [{
     firstname: string,
     lastname: string,
     role: string,
+    isActive: boolean,
 }];
 
 type Categories = [{
   id: string;
   name: string;
+  isActive: boolean;
 }];
 
 const useStyles = makeStyles(() =>
@@ -52,6 +53,7 @@ const useStyles = makeStyles(() =>
       width: '50%',
       margin: 'auto',
       borderRadius: '20px',
+      boxShadow: '0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.20)',
     },
     rateUserForm: {
       width: '80%',
@@ -106,7 +108,6 @@ const useStyles = makeStyles(() =>
 const Rate: React.FC = () => {
   const classes = useStyles();
   const userContext = useContext(UserContext);
-  const history = useHistory();
   const [rating, setRating] = useState<number>(1);
   const [users, setUsers] = useState<AllUser>();
   const [selectedUserID, setSelectedUserID] = useState<string>('');
@@ -115,36 +116,24 @@ const Rate: React.FC = () => {
   const [notes, setNotes] = useState<string>('');
   const [selectedCategoryID, setSelectedCategoryID] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>("Select a category");
-  const [open, setOpen] = useState(false);
-
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [alertType, setAlertType] = useState("successful");
+  const sessionContext = useContext(SessionContext);
 
   useEffect(() => {
-    if (sessionToken) {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          getAllUsers(sessionToken).then(result => {
-            setUsers(result.data.allUsers);
-          });
-          getAllCategories(sessionToken).then(result => {
-            setCategories(result.data.getAllCategories);
-          })
-        } else {
-          history.push('/login');
-        }
-      })
-    } else {
-      history.push('/login');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getAllUsers().then(result => {
+      setUsers(result.data.allUsers);
+    });
+    getAllCategories().then(result => {
+      setCategories(result.data.getAllCategories);
+    });
   }, [])
 
   const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
-
-    setOpen(false);
+    setAlertOpen(false);
   };
 
   const handleCategoryChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -156,15 +145,13 @@ const Rate: React.FC = () => {
   };
 
   const submitRating = () => {
-    let results;
-    rate(sessionToken, userContext.currentUser.id, selectedUserID, selectedCategoryID, rating, notes).then((r) => {
-      console.log(r);
-      results = r.data;
-      if (results == null){
-        //Show Error Popup
-        return null;
+    rate(sessionContext.sessionToken, userContext.currentUser.id, selectedUserID, selectedCategoryID, rating, notes).then((response) => {
+      if (response.data) {
+        setAlertOpen(true);
+        setAlertType("successful");
       } else {
-        setOpen(true);
+        setAlertOpen(true);
+        setAlertType("failed");
       }
     })
   }
@@ -183,7 +170,7 @@ const Rate: React.FC = () => {
           >
             <MenuItem value={"Select a user"}>Select a user</MenuItem>
             {(users && users.length > 0) &&
-              users.filter(user => user.id !== userContext.currentUser.id).map(user => {
+              users.filter(user => user.id !== userContext.currentUser.id).filter(user => user.isActive).map(user => {
               return <MenuItem key={user.id} value={user.firstname + " " + user.lastname} onClick={() => {
                 setSelectedUser(user.firstname + ' ' + user.lastname)
                 setSelectedUserID(user.id);
@@ -203,7 +190,7 @@ const Rate: React.FC = () => {
           >
             <MenuItem value={"Select a category"}>Select a category</MenuItem>
             {(categories && categories.length > 0) &&
-            categories.map(category => {
+            categories.filter(category => category.isActive).map(category => {
               return <MenuItem key={category.id} value={category.id} onClick={() => setSelectedCategoryID(category.id)}>
                 {category.name}
               </MenuItem>
@@ -222,7 +209,7 @@ const Rate: React.FC = () => {
               }
             }}
           />
-          <FormLabel required className={classes.formLabels}>Comments</FormLabel>
+          <FormLabel className={classes.formLabels}>Comments</FormLabel>
           <textarea
             className={classes.notesField}
             rows={10}
@@ -237,11 +224,16 @@ const Rate: React.FC = () => {
           submitRating();
         }}>Submit</Button>
       </section>
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert onClose={handleClose} severity="success">
-            Successful!
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
+        {alertType === "successful" ?
+          <Alert onClose={handleClose} severity={"success"}>
+            Rating Recorded!
+          </Alert> :
+          <Alert onClose={handleClose} severity={"error"}>
+            Something went wrong, please try again!
           </Alert>
-        </Snackbar>
+        }
+      </Snackbar>
     </section>
   );
 }

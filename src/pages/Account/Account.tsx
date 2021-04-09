@@ -1,31 +1,25 @@
 import React, { useContext, useEffect, useState } from "react";
 import {NavLink, useHistory, useParams, useLocation} from 'react-router-dom';
-import { format, parseISO } from "date-fns";
-import ProfilePlaceholder from '../../assets/ProfilePlaceholder.svg';
+import { format, parseISO, toDate } from "date-fns";
 import { UserContext } from "../../App";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { Button, MenuItem, Select, Typography, useMediaQuery } from "@material-ui/core";
 import CreatedRatingCard from "../../components/CreatedRatingCard/CreatedRatingCard";
 import {
-  getCategoryAverages,
   getOverallRatingAverage,
-  getRatingsCreated,
+  getRatingsCreated, getUserRatings
 } from "../../utils/requests/Rating";
-import {getCurrentUser, getUserByID} from "../../utils/requests/User";
 import { Rating } from '@material-ui/lab';
 import { RadioButtonChecked } from '@material-ui/icons';
+import Chart from "react-google-charts";
+import { getCategoryByID } from "../../utils/requests/Category";
+import { getUserByID } from "../../utils/requests/User";
 
 interface ParamTypes {
   apprenticeID: string
 }
 
-type CategoryAverages = [{
-  name: string;
-  categoryID: string;
-  average: number;
-}]
-
-type UserCreatedRatings = [{
+type UserRatings = [{
     id: string,
     createdAt: string,
     categoryID: string,
@@ -54,16 +48,7 @@ const useStyles = makeStyles((theme) =>
       justifyContent: 'space-evenly',
       alignItems: 'center',
       paddingTop: '0.5rem',
-    },
-    profileImage: {
-      [theme.breakpoints.down("sm")]:{
-        width: '10rem',
-        height: 'auto',
-      },
-      [theme.breakpoints.up("md")]:{
-        width: '16rem',
-        height: 'auto',
-      },
+      marginBottom: '2rem',
     },
     name: {
       [theme.breakpoints.down("sm")]:{
@@ -76,6 +61,12 @@ const useStyles = makeStyles((theme) =>
       fontWeight: 'normal',
       paddingBottom: '0.5rem',
       borderBottom: 'solid 2px',
+    },
+    chartSection: {
+      marginTop: '2rem'
+    },
+    chart: {
+      boxShadow: '0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12), 0 3px 5px -1px rgba(0,0,0,0.20)',
     },
     role: {
       [theme.breakpoints.down("sm")]:{
@@ -161,64 +152,104 @@ const useStyles = makeStyles((theme) =>
   }),
 );
 
+function groupBy(collection: any, property: string) {
+  let i = 0, val, index,
+    values = [], result = [];
+  for (; i < collection.length; i++) {
+    val = collection[i][property];
+    index = values.indexOf(val);
+    if (index > -1)
+      result[index].push(collection[i]);
+    else {
+      values.push(val);
+      result.push([collection[i]]);
+    }
+  }
+  return result;
+}
+
 const Account: React.FC = () => {
   const classes = useStyles();
   const userContext = useContext(UserContext);
   const history = useHistory();
   let location = useLocation();
-  const [userCreatedRatings, setUserCreatedRatings] = useState<UserCreatedRatings>();
+  const [userName, setUserName] = useState<string>('');
+  const [role, setRole] = useState<string>('');
+  const [userCreatedRatings, setUserCreatedRatings] = useState<UserRatings>();
   const [overallRating, setOverallRating] = useState<number>(0);
-  const [averageCategoryRatings, setAverageCategoryRatings] = useState<CategoryAverages>();
+  const [chartPoints, setChartPoints] = useState<Array<Array<any>>>([['Time', 'Rating']]);
+  const [userRatings, setUserRatings] = useState<UserRatings>();
+  const [averageCategoryRatings, setAverageCategoryRatings] = useState<Array<any>>([]);
   const [currentTab, setCurrentTab] = useState<string>("Given");
   const ratingSelectView = useMediaQuery('(max-width: 1050px)');
   let { apprenticeID } = useParams<ParamTypes>();
 
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
+  useEffect(() => {
+    let userID;
+    if (location.pathname === '/') {
+      userID = userContext.currentUser.id;
+    } else {
+      userID = apprenticeID;
+    }
+    getOverallRatingAverage(userID).then(response => {
+      setOverallRating(response.data.userOverallAverage);
+    });
+    getRatingsCreated(userID).then(response => {
+      setUserCreatedRatings(response.data.userReviewedRatings);
+    });
+    getUserRatings(userID).then(response => {
+      const allRatings = response.data.userRatings;
+      setUserRatings(allRatings);
+      const ratingsByCategory = groupBy(allRatings, "categoryID");
+      let categoryID: string = '';
+      let average: number = 0;
+      let newCategoryAverageRatings: Array<any> = [];
+      ratingsByCategory.forEach(categoryGroup => {
+        categoryID = categoryGroup[0].categoryID;
+        getCategoryByID(categoryID).then(response => {
+          let summedRatings = 0;
+          categoryGroup.forEach(rating => {
+            summedRatings += rating.rating;
+          });
+          average = summedRatings / categoryGroup.length;
+          const categoryAverageGroup =
+            {
+              "name": response.data.getCategoryByID.name,
+              "categoryID": categoryID,
+              "average": average,
+            };
+          newCategoryAverageRatings.push(categoryAverageGroup);
+        });
+      });
+      setAverageCategoryRatings(newCategoryAverageRatings);
+    });
+  }, [apprenticeID, location.pathname, userContext.currentUser.id]);
 
   useEffect(() => {
-    if (sessionToken) {
-      if (apprenticeID != null){
-        getUserByID(sessionToken, apprenticeID).then(response => {
-          if (response.data) {
-            const apprentice = response.data.userByID;
-            userContext.setCurrentUser(apprentice);
-            getOverallRatingAverage(sessionToken, apprentice.id).then(response => {
-              setOverallRating(response.data.userOverallAverage);
-            });
-            getCategoryAverages(sessionToken, apprentice.id).then(response => {
-              setAverageCategoryRatings(response.data.userRatingCategoryAverages);
-            });
-            getRatingsCreated(sessionToken, apprentice.id).then(response => {
-              setUserCreatedRatings(response.data.userReviewedRatings);
-            })
-          } else {
-            history.push('/login');
-          }
-        });
-      }
-      else {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          const user = response.data.me;
-          userContext.setCurrentUser(user);
-          getOverallRatingAverage(sessionToken, user.id).then(response => {
-            setOverallRating(response.data.userOverallAverage);
-          });
-          getCategoryAverages(sessionToken, user.id).then(response => {
-            console.log(response);
-            setAverageCategoryRatings(response.data.userRatingCategoryAverages);
-          });
-          getRatingsCreated(sessionToken, user.id).then(response => {
-            setUserCreatedRatings(response.data.userReviewedRatings);
-          })
-        } else {
-          history.push('/login');
-        }
-      });
-    }} else {
-      history.push('/login');
+    if (location.pathname !== '/') {
+      getUserByID(apprenticeID).then(response => {
+        let user = response.data.userByID;
+        setUserName(user.firstname + " " + user.lastname);
+        setRole(user.role);
+      })
+    } else {
+      let user = userContext.currentUser;
+      setUserName(user.firstname + " " + user.lastname);
+      setRole(user.role);
     }
-  }, []);
+  }, [apprenticeID, location.pathname, userContext.currentUser])
+
+  useEffect(() => {
+    // eslint-disable-next-line array-callback-return
+    userRatings?.map(rating => {
+      const createdDate = parseISO(rating.createdAt);
+      const formattedDate = toDate(createdDate);
+      let newChartPoints = chartPoints;
+      newChartPoints.push([formattedDate, rating.rating]);
+      // @ts-ignore
+      setChartPoints(newChartPoints);
+    });
+  }, [userRatings])
 
   const handleTabChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setCurrentTab(event.target.value as string);
@@ -227,16 +258,33 @@ const Account: React.FC = () => {
   return (
     <section className={classes.accountPage}>
       <section className={classes.profile}>
-        <img src={ProfilePlaceholder} title='Profile' className={classes.profileImage}  alt='Profile'/>
         <article>
-          <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
-          <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
-          <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.01} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
-          {userContext.currentUser.role === 'ADMIN' &&
-            <NavLink exact to='/addCategory' className={classes.link}>
-              <Button variant='contained'>Add Category</Button>
+          <Typography variant='h1' className={classes.name}>{userName}</Typography>
+          <Typography variant='h2' className={classes.role}>{role}</Typography>
+          <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.2} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
+          {((userContext.currentUser.role === 'FTE' || userContext.currentUser.role === 'ADMIN') && location.pathname === '/') &&
+            <NavLink exact to='/manage' className={classes.link}>
+              <Button variant='contained'>Manage Content</Button>
             </NavLink>
           }
+        </article>
+        <article className={classes.chartSection}>
+        {(userRatings && userRatings.length > 0) ?
+          <Chart
+            className={classes.chart}
+            chartType="ScatterChart"
+            loader={<div>Loading Chart</div>}
+            data={chartPoints}
+            options={{
+              title: ' Ratings Over Time',
+              hAxis: { title: 'Time' },
+              vAxis: { title: 'Rating', minValue: 0, maxValue: 5 },
+              legend: 'none',
+              trendlines: { 0: {} },
+            }}
+            rootProps={{ 'data-testid': '1' }} /> :
+            <Typography variant={"h5"}>No ratings received!</Typography>
+        }
         </article>
       </section>
       <section className={classes.tabSection}>
@@ -259,18 +307,25 @@ const Account: React.FC = () => {
             onChange={handleTabChange}
           >
             <MenuItem value={"Categories"}>Rating Categories</MenuItem>
-            <MenuItem value={"Given"}>Ratings Given</MenuItem>
+            {location.pathname === '/' &&
+              <MenuItem value={"Given"}>Ratings Given</MenuItem>
+            }
           </Select>
         }
         {currentTab === "Categories" ?
           <section className={classes.categoriesSection}>
             {(averageCategoryRatings && averageCategoryRatings.length > 0) &&
-              averageCategoryRatings.map(categoryAverage => {
-                return <Typography key={categoryAverage.categoryID} className={classes.category}>
-                  <NavLink exact to={'/category/' + categoryAverage.categoryID} className={classes.link}>{categoryAverage.name}: </NavLink>
-                  <Rating name="categoryRating" value={categoryAverage.average} precision={0.1} icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'} readOnly/>
-                </Typography>
-              })
+            averageCategoryRatings.map(categoryAverage => {
+              return <Typography key={categoryAverage.categoryID} className={classes.category}>
+                {location.pathname === "/" && <NavLink exact to={'/category/' + categoryAverage.categoryID}
+                         className={classes.link}>{categoryAverage.name}: </NavLink> }
+                {location.pathname === ("/apprentice/" + apprenticeID) && <NavLink exact to={'/apprentice/' + apprenticeID + '/category/' + categoryAverage.categoryID}
+                                                       className={classes.link}>{categoryAverage.name}: </NavLink> }
+                <Rating name="categoryRating" value={categoryAverage.average} precision={0.1}
+                        icon={<RadioButtonChecked fontSize="inherit"/>} size={'small'} readOnly/>
+              </Typography>
+
+            })
             }
           </section> :
           <section className={classes.userReviewedSection}>

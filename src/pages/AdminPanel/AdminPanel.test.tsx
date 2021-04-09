@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import AddCategory from "./AddCategory";
 import {Router} from "@material-ui/icons";
+import AdminPanel from "./AdminPanel";
 
-test('renders AddCategory component', () => {
+test('renders AdminPanel component', () => {
   const app = render(
     <Router>
-      <AddCategory />
+      <AdminPanel />
     </Router>);
 
   expect(app).toBeTruthy();

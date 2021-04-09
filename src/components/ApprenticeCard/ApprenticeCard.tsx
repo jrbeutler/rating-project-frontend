@@ -39,13 +39,12 @@ const ApprenticeCard: React.FC<RatingProps> = ({
 }) => {
   const classes = useStyles();
   const [apprenticeName, setApprenticeName] = useState<string>('');
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
     if (!apprenticeID) {
       return;
     }
-    getUserByID(sessionToken, apprenticeID).then((r) => {
+    getUserByID(apprenticeID).then((r) => {
       const user = r.data.userByID;
       setApprenticeName(user.firstname + ' ' + user.lastname);
     });

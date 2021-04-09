@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import {
@@ -72,7 +72,7 @@ const Login: React.FC = () => {
     if (userContext.currentUser.email !== '') {
       history.push('/');
     }
-  }, []);
+  })
 
   const submitLogin = async () => {
     const response = await login(email, password);

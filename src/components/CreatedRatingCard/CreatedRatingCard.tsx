@@ -48,14 +48,12 @@ const CreatedRatingCard: React.FC<RatingProps> = ({
   const [reviewedName, setReviewedName] = useState<string>('');
   const [category, setCategory] = useState<string>('');
 
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
-
   useEffect(() => {
-    getUserByID(sessionToken, reviewedID).then((r) => {
+    getUserByID(reviewedID).then((r) => {
       const user = r.data.userByID;
       setReviewedName(user.firstname + ' ' + user.lastname);
     });
-    getCategoryByID(sessionToken, categoryID).then(response => {
+    getCategoryByID(categoryID).then(response => {
       setCategory(response.data.getCategoryByID.name);
     });
   }, []);
