@@ -52,8 +52,6 @@ const App: React.FC = () => {
           history.push('/login');
         }
       });
-    } else {
-      history.push('/login');
     }
   }, [history, sessionToken])
 

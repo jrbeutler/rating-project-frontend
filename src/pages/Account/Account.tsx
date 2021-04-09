@@ -13,6 +13,7 @@ import { Rating } from '@material-ui/lab';
 import { RadioButtonChecked } from '@material-ui/icons';
 import Chart from "react-google-charts";
 import { getCategoryByID } from "../../utils/requests/Category";
+import { getUserByID } from "../../utils/requests/User";
 
 interface ParamTypes {
   apprenticeID: string
@@ -172,6 +173,8 @@ const Account: React.FC = () => {
   const userContext = useContext(UserContext);
   const history = useHistory();
   let location = useLocation();
+  const [userName, setUserName] = useState<string>('');
+  const [role, setRole] = useState<string>('');
   const [userCreatedRatings, setUserCreatedRatings] = useState<UserRatings>();
   const [overallRating, setOverallRating] = useState<number>(0);
   const [chartPoints, setChartPoints] = useState<Array<Array<any>>>([['Time', 'Rating']]);
@@ -223,6 +226,20 @@ const Account: React.FC = () => {
   }, [apprenticeID, location.pathname, userContext.currentUser.id]);
 
   useEffect(() => {
+    if (location.pathname !== '/') {
+      getUserByID(apprenticeID).then(response => {
+        let user = response.data.userByID;
+        setUserName(user.firstname + " " + user.lastname);
+        setRole(user.role);
+      })
+    } else {
+      let user = userContext.currentUser;
+      setUserName(user.firstname + " " + user.lastname);
+      setRole(user.role);
+    }
+  }, [apprenticeID, location.pathname, userContext.currentUser])
+
+  useEffect(() => {
     // eslint-disable-next-line array-callback-return
     userRatings?.map(rating => {
       const createdDate = parseISO(rating.createdAt);
@@ -238,16 +255,14 @@ const Account: React.FC = () => {
     setCurrentTab(event.target.value as string);
   };
 
-  console.log(averageCategoryRatings);
-
   return (
     <section className={classes.accountPage}>
       <section className={classes.profile}>
         <article>
-          <Typography variant='h1' className={classes.name}>{userContext.currentUser.firstname} {userContext.currentUser.lastname}</Typography>
-          <Typography variant='h2' className={classes.role}>{userContext.currentUser.role}</Typography>
+          <Typography variant='h1' className={classes.name}>{userName}</Typography>
+          <Typography variant='h2' className={classes.role}>{role}</Typography>
           <Typography className={classes.rating}>Overall Rating: <Rating name="overallRating" value={overallRating} precision={0.01} icon={<RadioButtonChecked fontSize="inherit"/>} readOnly/></Typography>
-          {userContext.currentUser.role === 'ADMIN' &&
+          {(userContext.currentUser.role === 'ADMIN' && location.pathname !== '/') &&
             <NavLink exact to='/manage' className={classes.link}>
               <Button variant='contained'>Manage Content</Button>
             </NavLink>
