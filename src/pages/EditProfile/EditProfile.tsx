@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, FormLabel, TextField, Typography } from "@material-ui/core";
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { UserContext } from "../../App";
-import { useHistory } from "react-router-dom";
-import { createUser, getCurrentUser, updateUser } from "../../utils/requests/User";
+import { SessionContext } from "../../App";
+import { updateUser } from "../../utils/requests/User";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
 
@@ -74,33 +73,15 @@ const useStyles = makeStyles(() =>
 
 const EditUser: React.FC = () => {
   const classes = useStyles();
-  const history = useHistory();
-  const userContext = useContext(UserContext);
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [oldPassword, setOldPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
-
-  const sessionToken = window.sessionStorage.getItem('ratingToken');
-
-  useEffect(() => {
-    if (sessionToken) {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          const user = response.data.me;
-          userContext.setCurrentUser(user);
-        } else {
-          history.push('/login');
-        }
-      });
-    } else {
-      history.push('/login');
-    }
-  }, []);
+  const sessionContext = useContext(SessionContext);
 
   const submitForm = () => {
-    updateUser(sessionToken, firstName, lastName, oldPassword, newPassword).then(response => {
+    updateUser(sessionContext.sessionToken, firstName, lastName, oldPassword, newPassword).then(response => {
       if (response.data) {
         setOpen(true);
       } else {

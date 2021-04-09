@@ -44,20 +44,9 @@ const ViewApprentices: React.FC = () => {
   const sessionToken = window.sessionStorage.getItem('ratingToken');
 
   useEffect(() => {
-    if (sessionToken) {
-      getCurrentUser(sessionToken).then(response => {
-        if (response.data) {
-          getAllApprentices(sessionToken).then(result => {
-            setApprentices(result.data.allApprentices);
-          });
-        } else {
-          history.push('/login');
-        }
-      })
-    } else {
-      history.push('/login');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getAllApprentices(sessionToken).then(result => {
+      setApprentices(result.data.allApprentices);
+    });
   }, [])
 
   return (
